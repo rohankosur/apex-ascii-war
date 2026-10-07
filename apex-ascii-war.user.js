@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (Cyberpunk Bloom, Bunker Warfare & Citadel Overhaul)
 // @namespace    neon.ascii.war
-// @version      18.0.0
+// @version      19.0.0
 // @description  Cyberpunk Neon Bloom, Fortified Middle Bunkers, Objective Assault AI, Air Fleet Expansion, Citadel Defense Batteries, Full Tri-Sphere Subterranean Warfare, and Zero Trajectory Lines.
 // @match        https://gemini.google.com/*
 // @updateURL    https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js
@@ -140,7 +140,26 @@
   const style = GM_addStyle(`
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
 
-    /* Global Typography & Deep Transparency */
+    /* --- 1. CONSISTENT MONOSPACE TYPOGRAPHY ACROSS ENTIRE INTERFACE --- */
+    :root, html.apex-war-enabled {
+      --gem-sys-font--body-large: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--body-medium: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--body-small: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--label-large: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--label-medium: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--label-small: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--title-large: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--title-medium: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--title-small: 'Share Tech Mono', monospace !important;
+      --gem-sys-font--headline-large: 'VT323', monospace !important;
+      --gem-sys-font--headline-medium: 'VT323', monospace !important;
+      --gem-sys-font--headline-small: 'VT323', monospace !important;
+      --gem-font-family: 'Share Tech Mono', monospace !important;
+      --bard-font-family: 'Share Tech Mono', monospace !important;
+      --mat-sys-font-body-large: 'Share Tech Mono', monospace !important;
+      --mat-sys-font-body-medium: 'Share Tech Mono', monospace !important;
+      --mat-sys-font-body-small: 'Share Tech Mono', monospace !important;
+    }
     html.apex-war-enabled {
       background: #04060e !important;
       font-family: 'Share Tech Mono', monospace !important;
@@ -154,7 +173,7 @@
       position: relative;
       z-index: 1;
     }
-    /* Guarantee that NO parent containers block out the background */
+    /* Ensure all structural and scroll containers are transparent */
     html.apex-war-enabled :is(chat-app, bard-app, main, .page-content, .main-content, .conversation-container, infinite-scroller, .chat-history, [class*="conversation"]) {
       background-color: transparent !important;
       background-image: none !important;
@@ -163,13 +182,49 @@
       --gem-sys-color--background: transparent;
     }
 
-    /* Preserve Icon Font Ligatures (Prevents [u, _a], n glitches) */
-    html.apex-war-enabled :is(mat-icon, .google-symbols, .material-symbols-outlined, .material-symbols-rounded, .material-icons, [fonticon]) {
+    /* Force consistent Share Tech Mono across ALL text, headings, lists, prose & markdown */
+    html.apex-war-enabled :is(
+      p, li, ul, ol, label, input, textarea,
+      h1, h2, h3, h4, h5, h6,
+      blockquote, table, th, td,
+      .model-response-text, .response-content, .markdown, message-content,
+      .text-input-field, rich-textarea, .ql-editor
+    ),
+    html.apex-war-enabled :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, .markdown, .model-response-text) :is(span:not([class*="symbol"]):not([class*="icon"]):not([class*="mat-"]):not([class*="google"]), a, strong, em, b, i:not([class*="material"]):not([class*="icon"])) {
+      font-family: 'Share Tech Mono', monospace !important;
+      letter-spacing: 0.35px !important;
+    }
+
+    /* STRICT EXCEPTION: Icon fonts MUST NEVER be overridden by text fonts! */
+    html.apex-war-enabled :is(
+      mat-icon,
+      [class*="mat-icon"],
+      .google-symbols,
+      [class*="google-symbols"],
+      .material-symbols-outlined,
+      .material-symbols-rounded,
+      .material-symbols-sharp,
+      .material-icons,
+      [fonticon],
+      [data-mat-icon-type],
+      [data-mat-icon-name],
+      i[class*="material"],
+      span[class*="symbol"],
+      span[class*="icon"],
+      [class*="symbol"],
+      [class*="icon"]
+    ) {
       font-family: 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons' !important;
       font-style: normal !important;
+      font-weight: normal !important;
       letter-spacing: normal !important;
       text-transform: none !important;
       direction: ltr !important;
+      white-space: nowrap !important;
+      word-wrap: normal !important;
+      font-feature-settings: 'liga' 1 !important;
+      -webkit-font-feature-settings: 'liga' 1 !important;
+      -webkit-font-smoothing: antialiased !important;
     }
 
     /* Subtle 80s CRT Scanline & Phosphor Vignette (Transparent, does not darken background) */
@@ -187,8 +242,9 @@
       opacity: 0.42;
     }
 
-    /* Gemini Hero Greeting: 80s Outrun Arcade Title Screen */
-    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], h1, .title, .greeting-title, [class*="greeting"]) {
+    /* Gemini Hero Greeting: 80s Outrun Arcade Title Screen (Only in hero greeting container) */
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], [class*="greeting"]) :is(h1, .title, [class*="title"]),
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], .greeting-title, [class*="greeting-title"]) {
       font-family: 'VT323', monospace !important;
       font-size: 3.4rem !important;
       letter-spacing: 5px !important;
@@ -200,7 +256,8 @@
       text-align: center !important;
       display: block !important;
     }
-    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], h1, .title, .greeting-title, [class*="greeting"])::after {
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], .greeting-title, [class*="greeting-title"])::after,
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], [class*="greeting"]) > :is(h1, .title)::after {
       content: '►► 1P CO-OP CYBERDECK // INSERT COIN TO INITIATE ◄◄';
       display: block;
       font-family: 'Share Tech Mono', monospace !important;
@@ -217,7 +274,7 @@
       50% { opacity: 0.55; transform: scale(0.99); }
     }
 
-    /* --- INPUT CHASSIS: SINGLE CLEAN PILL (NO WEIRD BUTTON BOXES) --- */
+    /* --- 2. INPUT CHASSIS: SINGLE CLEAN PILL (NO WEIRD BUTTON BOXES) --- */
 
     /* Reset all outer and parent wrappers */
     html.apex-war-enabled :is(chat-window-input, .input-area, .input-container, .input-area-container) {
@@ -256,7 +313,6 @@
 
     /* Input text formatting */
     html.apex-war-enabled :is(.text-input-field, rich-textarea, textarea, div[contenteditable="true"], .ql-editor, [class*="textarea"]) {
-      font-family: 'Share Tech Mono', monospace !important;
       font-size: 15px !important;
       color: #ffffff !important;
       letter-spacing: 0.8px !important;
@@ -266,7 +322,6 @@
     /* Model Selector (Flash dropdown) inside input box: clean text, no box */
     html.apex-war-enabled div.input-box :is([data-test-id*="model"], [class*="model-picker"]) {
       color: #00f0ff !important;
-      font-family: 'Share Tech Mono', monospace !important;
       font-size: 13px !important;
       opacity: 0.85;
       padding: 0 4px !important;
@@ -276,7 +331,7 @@
       color: #ff2a6d !important;
     }
 
-    /* --- RETRO ARCADE ICONS & ACTION BUTTONS --- */
+    /* --- 3. RETRO ARCADE ICONS & ACTION BUTTONS --- */
 
     /* Global Navigation Drawer & Sidebar Icons */
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, .side-nav, header) :is(mat-icon, svg) {
@@ -337,7 +392,7 @@
       border: none !important;
     }
 
-    /* --- CHAT MESSAGES: TRANSPARENT & CLEAN (NO GIANT SCREEN BORDERS) --- */
+    /* --- 4. CHAT MESSAGES: TRANSPARENT & CLEAN --- */
 
     /* Model Response: 100% transparent, NO giant outer bounding box! */
     html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"], [data-test-id*="model-response"], .response-content, message-content) {
@@ -345,41 +400,26 @@
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
-      font-family: 'Share Tech Mono', monospace !important;
       color: #e4f7ff !important;
-      letter-spacing: 0.4px !important;
       line-height: 1.65 !important;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 240, 255, 0.3) !important;
     }
 
-    /* User Query Bubbles: Sleek Translucent Synthwave Glass */
-    html.apex-war-enabled :is(.user-query, [class*="user-query"], [data-test-id="user-query"]) {
-      background: rgba(22, 10, 32, 0.35) !important;
-      backdrop-filter: blur(6px) !important;
-      border: 1px solid rgba(255, 42, 109, 0.5) !important;
-      border-radius: 6px !important;
-      box-shadow: 0 0 8px rgba(255, 42, 109, 0.2) !important;
-      font-family: 'Share Tech Mono', monospace !important;
-      color: #ffe6ef !important;
-      letter-spacing: 0.4px !important;
-      padding: 12px 16px !important;
-    }
+    /* --- 5. USER PROMPT BUBBLE: SINGLE CLEAN PILL (ZERO MULTIPLE RED BORDERS) --- */
 
-    /* --- CODE BLOCKS: ULTRA-CLEAN TRANSLUCENT GLASS (ZERO NESTED BORDERS) --- */
-
-    /* Target ONLY outer code block container: single subtle green frame, 35% translucent fill */
-    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block-wrapper"], div:has(> pre > code)) {
-      background: rgba(2, 6, 14, 0.35) !important;
-      backdrop-filter: blur(8px) !important;
-      border: 1px solid rgba(57, 255, 20, 0.55) !important;
-      border-radius: 4px !important;
+    /* Reset ALL outer query containers to be completely borderless & transparent */
+    html.apex-war-enabled :is(user-query, .user-query, [class*="user-query"], [data-test-id*="user-query"]) {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      outline: none !important;
       box-shadow: none !important;
-      margin: 10px 0 !important;
-      overflow: hidden !important;
+      padding: 0 !important;
+      margin: 8px 0 !important;
     }
 
-    /* Strictly strip borders, outlines & shadows from ALL child elements inside code blocks */
-    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block-wrapper"], div:has(> pre > code)) :is(*, pre, code, div, header) {
+    /* Reset all intermediate wrappers and descendants that are NOT the speech bubble */
+    html.apex-war-enabled :is(user-query, .user-query, [class*="user-query"], [data-test-id*="user-query"]) :is(div, p, span, section, [class*="wrapper"], [class*="container"]):not([class*="bubble"]):not([class*="query-content"]):not([class*="user-query-text-container"]) {
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
@@ -387,20 +427,133 @@
       background-color: transparent !important;
     }
 
-    /* Code Block Header (Language tag, copy button) */
-    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block-wrapper"]) :is(.header, [class*="header"], [class*="decoration"]) {
+    /* Style ONLY the single actual speech bubble holding the prompt text */
+    html.apex-war-enabled :is(user-query, .user-query, [class*="user-query"]) :is(.user-query-bubble, [class*="bubble"], [class*="query-content"], [class*="user-query-text-container"]) {
+      background: rgba(18, 12, 28, 0.55) !important;
+      backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(0, 240, 255, 0.45) !important; /* Single sleek cyan border instead of harsh red boxes */
+      border-radius: 8px !important;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.15) !important;
+      padding: 10px 16px !important;
+      display: inline-block !important;
+      max-width: 80% !important;
+    }
+
+    /* Reset inner text wrappers inside bubble so they don't produce a second or third border */
+    html.apex-war-enabled :is(.user-query-bubble, [class*="bubble"]) :is(div, p, span, [class*="text"]) {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+
+    /* Prompt text styling */
+    html.apex-war-enabled :is(.user-query-text, [class*="user-query-text"], [data-test-id*="user-query"]) {
+      color: #ffffff !important;
+      font-size: 15px !important;
+      letter-spacing: 0.4px !important;
+    }
+
+    /* --- 6. CODE BLOCKS: ULTRA-CLEAN TRANSLUCENT GLASS (ZERO NESTED BORDERS) --- */
+
+    /* Target ONLY outer code block container: single subtle green frame, 35% translucent fill */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) {
+      background: rgba(2, 6, 14, 0.38) !important;
+      backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(57, 255, 20, 0.55) !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 10px rgba(57, 255, 20, 0.12) !important;
+      margin: 10px 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* Strictly strip borders, outlines & shadows from ALL child containers inside code blocks */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(pre, code, div, section, [class*="content"]) {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+
+    /* Code Block Header (Language tag & action buttons bar) */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(.header, [class*="header"], [class*="decoration"], [class*="action-bar"]) {
       background: rgba(57, 255, 20, 0.08) !important;
       border-bottom: 1px solid rgba(57, 255, 20, 0.25) !important;
       color: #39ff14 !important;
-      font-family: 'Share Tech Mono', monospace !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 6px 12px !important;
     }
 
-    /* Code typography */
+    /* Target the Copy Code and Download Code action buttons */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"], [class*="action"], [class*="copy"], [class*="download"]) {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      cursor: pointer !important;
+      padding: 4px 6px !important;
+      border-radius: 4px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      transition: all 0.2s ease !important;
+    }
+
+    /* Target Material Symbols inside code block action buttons */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]) :is(mat-icon, [class*="mat-icon"], .google-symbols, [class*="google-symbols"], [fonticon], [data-mat-icon-type], span[class*="icon"], span[class*="symbol"]) {
+      font-family: 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons' !important;
+      font-style: normal !important;
+      font-weight: normal !important;
+      font-feature-settings: 'liga' 1 !important;
+      -webkit-font-feature-settings: 'liga' 1 !important;
+      color: #39ff14 !important;
+      font-size: 18px !important;
+      line-height: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      filter: drop-shadow(0 0 4px rgba(57, 255, 20, 0.6)) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    /* Target SVG icons inside code block action buttons */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]) svg {
+      width: 18px !important;
+      height: 18px !important;
+      min-width: 18px !important;
+      min-height: 18px !important;
+      fill: #39ff14 !important;
+      color: #39ff14 !important;
+      filter: drop-shadow(0 0 4px rgba(57, 255, 20, 0.6)) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    /* Hover effect for copy and download buttons */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]):hover :is(mat-icon, [class*="mat-icon"], .google-symbols, [fonticon], span[class*="icon"], span[class*="symbol"]) {
+      color: #00f0ff !important;
+      filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9)) !important;
+      transform: scale(1.15) !important;
+    }
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]):hover svg {
+      fill: #00f0ff !important;
+      color: #00f0ff !important;
+      filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9)) !important;
+      transform: scale(1.15) !important;
+    }
+
+    /* Code typography: matrix green mono */
     html.apex-war-enabled :is(pre code, code) {
-      font-family: 'VT323', 'Courier New', monospace !important;
+      font-family: 'Share Tech Mono', monospace !important;
       color: #39ff14 !important;
       text-shadow: 0 0 4px rgba(57, 255, 20, 0.5) !important;
-      font-size: 16px !important;
+      font-size: 14px !important;
     }
 
     /* Inline Code (e.g. yabai, Cmd + Shift + F in text): NO borders, NO button box */
@@ -414,7 +567,7 @@
       border-radius: 3px !important;
       padding: 1px 5px !important;
       color: #39ff14 !important;
-      font-size: 15px !important;
+      font-size: 14px !important;
     }
 
     /* Left Navigation Drawer & Sidebar: Translucent Cyberdeck */
@@ -423,7 +576,6 @@
       backdrop-filter: blur(12px) !important;
       border-right: 1.5px solid rgba(0, 240, 255, 0.4) !important;
       box-shadow: 2px 0 16px rgba(0, 240, 255, 0.15) !important;
-      font-family: 'Share Tech Mono', monospace !important;
     }
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(a, button, [role="button"]):hover {
       color: #00f0ff !important;
@@ -486,7 +638,7 @@
     },
     stats() {
       return {
-        version: '18.0.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '19.0.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1)
@@ -494,7 +646,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v18.0.0 ACTIVE - High Transparency & Clean Borders Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v19.0.0 ACTIVE - Consistent Fonts, Single Cyan Bubble & Fixed Code Icons Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {

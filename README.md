@@ -25,12 +25,17 @@ An epic, high-performance, real-time ASCII tactical battle simulator userscript 
   - **Engineer Electric Arc-Welding**: Real-time electric green welding beam connects engineers to damaged hulls with crackling sparks during field repairs.
   - **Squad Voice Callouts**: AA sky alerts (`BOGEY OVERHEAD!`), dying RPG parting shots (`AVENGE ME!`), vehicle ramming charges (`RAMMING SPEED!`), and crash warnings (`REACTOR CRITICAL!`).
   - **Dynamic Adaptive Performance**: Frame-time EMA monitor (`adapt()`) automatically scales particle count and bloom to guarantee smooth 60 FPS on all displays.
+- **80s Retro Arcade UI & Cyberdeck Theme**:
+  - Consistent monospace typography (`Share Tech Mono`) across Gemini's interface, conversation markdown, and responses via CSS custom property overrides.
+  - Sleek, single translucent cyan prompt speech bubble (`border: 1px solid rgba(0, 240, 255, 0.45)`) eliminating multiple nested red borders.
+  - Crisp, glowing vector action icons (Material Symbols & SVGs) for code block copy and download buttons with hover effects.
+  - Deep 40-50% translucency across chat bubbles so the full tactical battle, skyline, and Outrun sun remain visible.
 
 ## Installation
 Install via Tampermonkey or Violentmonkey in Chrome:
-1. Open Tampermonkey/Violentmonkey dashboard.
-2. Create a new script and paste the contents of `apex-ascii-war.user.js`.
-3. Navigate to `https://gemini.google.com/*` and watch the war unfold in the background!
+1. **One-Click Install**: Open [apex-ascii-war.user.js](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js) in your browser.
+2. Tampermonkey will prompt you to install/update to **v19.0.0**. Click **Install** (or **Update**).
+3. Navigate to `https://gemini.google.com/*` and refresh the page!
 
 ## Keybindings & Menu Controls
 - `Alt + Shift + W`: Pause / Resume battle simulation.
