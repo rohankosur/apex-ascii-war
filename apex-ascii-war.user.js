@@ -378,6 +378,15 @@
     if (source === 'fighter' && !u.flying) amount *= .45;
     if (u.ducking) amount *= .65;
 
+    // Suppression build-up under heavy fire
+    if (!u.flying && !u.struct && !u.sub) {
+      u.suppression = Math.min(100, (u.suppression || 0) + amount * 1.5);
+      if (u.suppression > 65 && !u.ducking && Math.random() < .45) {
+        u.ducking = true;
+        say(u.x, u.y - 18, 'DIVE!', '#ffd166', .85);
+      }
+    }
+
     // Trench damage reduction
     const inTrench = trenches.some(t => Math.abs(t.x - u.x) < 32);
     if (inTrench && !u.flying && !u.sub) amount *= .35;
@@ -387,9 +396,11 @@
     if (!u.hp) {
       if (attacker && attacker.hp > 0) {
         attacker.kills = (attacker.kills || 0) + 1;
-        if (attacker.kills >= 5 && !attacker.hero) {
+        const heavyKill = ['titan', 'dread', 'battleship'].includes(u.kind);
+        if (!attacker.hero && (attacker.kills >= 5 || heavyKill)) {
           attacker.hero = true; attacker.heroTime = 14;
-          say(attacker.x, attacker.y - 28, '★★★ ACE HERO!', '#ffe066', 2.0);
+          attacker.hp = Math.min(attacker.maxHP, attacker.hp + attacker.maxHP * .4);
+          say(attacker.x, attacker.y - 28, heavyKill ? '★ SLAYER HERO!' : '★★★ ACE HERO!', '#ffe066', 2.0);
         }
       }
 
@@ -705,6 +716,11 @@
         }
       }
     }
+
+    // AA calls out sky alert to squad
+    if (u.kind === 'aa' && u.target?.flying && Math.random() < .15) {
+      say(u.x, u.y - 25, 'BOGEY OVERHEAD!', COLORS[u.team], 1.0);
+    }
   }
 
   function fire(u, x, y) {
@@ -897,13 +913,16 @@
       return;
     }
 
-    // --- AEGIS: MOBILE SHIELD SPEARHEAD ---
+    // --- AEGIS: MOBILE SHIELD SPEARHEAD & PHALANX RALLY ---
     if (u.kind === 'aegis') {
-      if (Math.abs(u.x - assaultGoalX) > 45) {
-        u.orderX = u.x + dir * 85;
-      } else {
-        u.orderX = assaultGoalX;
+      u.rallyTime = (u.rallyTime || 0) + 0.3;
+      if (u.rally === 'gather' && (u.rallyTime > 3.5 || escorts >= 3)) {
+        u.rally = 'push'; u.rallyTime = 0;
+        say(u.x, u.y - 25, 'ADVANCE!', COLORS[u.team], 1.2);
+      } else if (u.rally === 'push' && u.rallyTime > 7 && (escorts < 1 || u.shield < 30)) {
+        u.rally = 'gather'; u.rallyTime = 0;
       }
+      u.orderX = u.rally === 'gather' ? u.x : assaultGoalX;
       return;
     }
 
@@ -2357,16 +2376,40 @@
         ctx.globalAlpha = 1;
       }
 
-      // Hero Crown & Regalia
+      // Hero Crown & Regalia + Floating Golden Heat Embers
       if (u.hero) {
         ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 1.5; ctx.globalAlpha = .7 + Math.sin(clock * 10) * .3;
         ctx.beginPath(); ctx.arc(u.x, u.y - 8, u.radius + 6, 0, Math.PI * 2); ctx.stroke();
         ctx.font = 'bold 10px monospace'; ctx.fillStyle = '#ffd700'; ctx.textAlign = 'center';
         ctx.fillText('\\^/', u.x, u.y - 30);
         ctx.globalAlpha = 1;
+        if (quality > 0 && Math.random() < .28 && particles.length < limits().debris) {
+          particles.push({
+            x: u.x + rand(-8, 8), y: u.y - 10,
+            vx: rand(-12, 12), vy: -rand(25, 55),
+            life: rand(0.35, 0.65), color: '#ffd700', bounced: false
+          });
+        }
+      }
+
+      // Field Engineer Electric Arc-Welding Beam & Sparks
+      if (u.kind === 'engineer' && u.repair?.hp > 0 && Math.hypot(u.x - u.repair.x, u.y - u.repair.y) < 115) {
+        ctx.save();
+        if (quality > 0) { ctx.shadowBlur = 6; ctx.shadowColor = '#a8ffb2'; }
+        ctx.strokeStyle = '#a8ffb2cc'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(u.x, u.y - 12); ctx.lineTo(u.repair.x, u.repair.y - 10); ctx.stroke();
+        if (quality > 0 && Math.random() < .35 && particles.length < limits().debris) {
+          particles.push({
+            x: u.repair.x + rand(-4, 4), y: u.repair.y - 10,
+            vx: rand(-30, 30), vy: -rand(20, 60),
+            life: .22, color: '#caffd0', bounced: false
+          });
+        }
+        ctx.restore();
       }
 
       const s = sprite(u.kind, u.team, u.face, u.flash > 0);
+      const drawY = u.ducking ? u.y + 6 : u.y;
 
       // Kinetic Banking & Pitch
       if (u.flying && u.kind !== 'dread') {
@@ -2375,12 +2418,12 @@
         else ctx.rotate(Math.atan2(Math.sin(u.heading), Math.cos(u.heading)) + (u.face < 0 ? Math.PI : 0));
         ctx.drawImage(s, -s.width / 2, -30); ctx.restore();
       } else {
-        ctx.drawImage(s, Math.round(u.x - s.width / 2), Math.round(u.y - 30));
+        ctx.drawImage(s, Math.round(u.x - s.width / 2), Math.round(drawY - 30));
       }
 
       const width = u.kind === 'dread' || u.kind === 'battleship' ? 80 : u.kind === 'titan' ? 44 : 26;
-      ctx.fillStyle = '#24283a'; ctx.fillRect(u.x - width / 2, u.y - 25, width, 3);
-      ctx.fillStyle = u.hero ? '#ffd700' : COLORS[u.team]; ctx.fillRect(u.x - width / 2, u.y - 25, width * u.hp / u.maxHP, 3);
+      ctx.fillStyle = '#24283a'; ctx.fillRect(u.x - width / 2, drawY - 25, width, 3);
+      ctx.fillStyle = u.hero ? '#ffd700' : COLORS[u.team]; ctx.fillRect(u.x - width / 2, drawY - 25, width * u.hp / u.maxHP, 3);
     }
 
     // CAS Target Brackets
@@ -2510,10 +2553,20 @@
     resetRound();
   }
 
+  function adapt(elapsed) {
+    frameEMA += (elapsed * 1000 - frameEMA) * .04;
+    if (!autoQuality) return;
+    qualityTimer += elapsed;
+    if (frameEMA < 19) goodTime += elapsed; else goodTime = 0;
+    if (qualityTimer > 3 && frameEMA > 23 && quality > 0) { quality--; qualityTimer = 0; goodTime = 0; }
+    else if (goodTime > 15 && quality < 2) { quality++; qualityTimer = 0; goodTime = 0; }
+  }
+
   function frame(ts) {
     raf = 0; if (stopped || document.hidden) return;
     if (paused) { render(); last = null; return; }
     const elapsed = last === null ? 0 : Math.max(0, (ts - last) / 1000); last = ts;
+    if (elapsed > 0) adapt(Math.min(elapsed, .25));
     accumulator += Math.min(elapsed, .25);
     while (accumulator >= CFG.step) { update(CFG.step); accumulator -= CFG.step; }
     render();
@@ -2536,6 +2589,9 @@
   if (typeof GM_registerMenuCommand === 'function') {
     menus.push(GM_registerMenuCommand('Siege: pause / resume (Alt+Shift+W)', () => api.pause()));
     menus.push(GM_registerMenuCommand('Siege: restart battle', () => api.reset()));
+    menus.push(GM_registerMenuCommand('Siege: automatic dynamic quality', () => api.setQuality('auto')));
+    menus.push(GM_registerMenuCommand('Siege: high quality (cyberpunk bloom)', () => api.setQuality(2)));
+    menus.push(GM_registerMenuCommand('Siege: low quality (high performance)', () => api.setQuality(0)));
   }
 
   resize(); schedule();
