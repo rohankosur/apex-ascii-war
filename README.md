@@ -18,7 +18,13 @@ An epic, high-performance, real-time ASCII tactical battle simulator userscript 
   - Right Tower: Parapet Flak & SAM Battery (range 720px).
 - **Fortified Middle Outpost Bunkers**:
   - Low-profile armored pillboxes embedded into the terrain with glowing firing slits, radio antennas, and capture progress meters.
-- **Zero Trajectory Lines**: Absolute guarantee of immersion without visible trajectory prediction lines.
+- **Tactical Battlefield AI & Formations**:
+  - **Aegis Phalanx Spearhead**: Aegis gathers nearby infantry into shield phalanxes before rallying with an `ADVANCE!` assault push.
+  - **Infantry Suppression & Prone Cover**: Units under intense barrage accumulate suppression, shout `DIVE!`, and crawl prone for 35% cover damage reduction.
+  - **Ace & Slayer Heroes**: Units promoted to Hero status on 5-kill streaks or upon felling an enemy Dreadnought/Titan/Citadel (`★ SLAYER HERO!`), gaining +30% damage, +40% speed, healing, golden regalia, and ascending heat sparks.
+  - **Engineer Electric Arc-Welding**: Real-time electric green welding beam connects engineers to damaged hulls with crackling sparks during field repairs.
+  - **Squad Voice Callouts**: AA sky alerts (`BOGEY OVERHEAD!`), dying RPG parting shots (`AVENGE ME!`), vehicle ramming charges (`RAMMING SPEED!`), and crash warnings (`REACTOR CRITICAL!`).
+  - **Dynamic Adaptive Performance**: Frame-time EMA monitor (`adapt()`) automatically scales particle count and bloom to guarantee smooth 60 FPS on all displays.
 
 ## Installation
 Install via Tampermonkey or Violentmonkey in Chrome:
@@ -26,6 +32,12 @@ Install via Tampermonkey or Violentmonkey in Chrome:
 2. Create a new script and paste the contents of `apex-ascii-war.user.js`.
 3. Navigate to `https://gemini.google.com/*` and watch the war unfold in the background!
 
-## Keybindings
+## Keybindings & Menu Controls
 - `Alt + Shift + W`: Pause / Resume battle simulation.
 - `Alt + Shift + Q`: Cycle visual quality (`auto` / `low` / `medium` / `high`).
+- **Tampermonkey Menu Presets**:
+  - `Siege: pause / resume`
+  - `Siege: restart battle`
+  - `Siege: automatic dynamic quality`
+  - `Siege: high quality (cyberpunk bloom)`
+  - `Siege: low quality (high performance)`
