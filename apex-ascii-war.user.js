@@ -178,7 +178,7 @@
     },
     stats() {
       return {
-        version: '16.0.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '17.0.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1)
@@ -261,27 +261,16 @@
     grid.clear(); crashHazards.length = 0; roundTime = 0; winner = null; endTimer = 0; shake = 0;
     spawnTimers = [0, 0]; airTimers = [1, 1.5]; minerTimers = [1.5, 2.5]; meteorTimer = rand(22, 34);
 
-    // 1-in-4 probability for naval map, 3-in-4 (75%) for main continental 3-layer siege
-    biome = Math.random() < 0.25 ? 'naval' : 'land';
+    // Continental tri-sphere siege with full Stratosphere, Surface, and Subterranean layers
+    biome = 'land';
     doctrines = [Math.random() < .5 ? 'SPEARHEAD' : 'TURTLE', Math.random() < .5 ? 'SPEARHEAD' : 'TURTLE'];
 
     const castleOffset = clamp(W * 0.065, 80, 110);
-    if (biome === 'naval') {
-      islands = [
-        { x: castleOffset, r: 85, h: 26 },
-        { x: W * .28, r: 50, h: 24 },
-        { x: W * .50, r: 65, h: 32 },
-        { x: W * .72, r: 50, h: 24 },
-        { x: W - castleOffset, r: 85, h: 26 }
-      ];
-      points = [.28, .5, .72].map((f, i) => ({ x: W * f, progress: 0, owner: -1, label: 'ATOLL-' + (i + 1) }));
-    } else {
-      terrain = Array.from({ length: 81 }, (_, i) => H * (.75 + .035 * Math.sin(i * .21) + .028 * Math.cos(i * .43)));
-      points = [.28, .5, .72].map((f, i) => ({ x: W * f, progress: 0, owner: -1, label: String(i + 1) }));
+    terrain = Array.from({ length: 81 }, (_, i) => H * (.75 + .035 * Math.sin(i * .21) + .028 * Math.cos(i * .43)));
+    points = [.28, .5, .72].map((f, i) => ({ x: W * f, progress: 0, owner: -1, label: String(i + 1) }));
 
-      tunnels.push({ x: 30, y: H * .88, team: 0, life: 999 });
-      tunnels.push({ x: W - 30, y: H * .88, team: 1, life: 999 });
-    }
+    tunnels.push({ x: 30, y: H * .88, team: 0, life: 999 });
+    tunnels.push({ x: W - 30, y: H * .88, team: 1, life: 999 });
 
     bases = [0, 1].map(team => {
       const bx = team ? W - castleOffset : castleOffset;
@@ -1862,74 +1851,154 @@
   }
 
   function paintTerrain() {
-    bg.fillStyle = '#060810'; bg.fillRect(0, 0, W, H);
+    // 1. Synthwave Deep Night Sky Gradient
+    const skyGrad = bg.createLinearGradient(0, 0, 0, H * .82);
+    skyGrad.addColorStop(0, '#03050c');
+    skyGrad.addColorStop(0.35, '#081022');
+    skyGrad.addColorStop(0.70, '#101b38');
+    skyGrad.addColorStop(1, '#18284e');
+    bg.fillStyle = skyGrad;
+    bg.fillRect(0, 0, W, H);
 
-    if (biome === 'naval') {
-      const grad = bg.createLinearGradient(0, H * .72, 0, H);
-      grad.addColorStop(0, '#0c2244'); grad.addColorStop(1, '#050f1f');
-      bg.fillStyle = grad; bg.fillRect(0, H * .74, W, H * .26);
-      for (const isl of islands) {
-        bg.fillStyle = '#1c2d28';
-        bg.beginPath(); bg.arc(isl.x, H * .76, isl.r, 0, Math.PI, true); bg.fill();
-        bg.strokeStyle = '#38664b'; bg.lineWidth = 2; bg.stroke();
+    // Distant Neon Data-Moon & Orbital Space Elevator Tether
+    bg.save();
+    const moonX = W * 0.82, moonY = H * 0.16;
+    const moonGrad = bg.createRadialGradient(moonX, moonY, 4, moonX, moonY, 28);
+    moonGrad.addColorStop(0, 'rgba(0,240,255,0.45)');
+    moonGrad.addColorStop(0.6, 'rgba(0,240,255,0.12)');
+    moonGrad.addColorStop(1, 'rgba(0,240,255,0)');
+    bg.fillStyle = moonGrad;
+    bg.beginPath(); bg.arc(moonX, moonY, 28, 0, Math.PI * 2); bg.fill();
+    bg.strokeStyle = 'rgba(0,240,255,0.6)'; bg.lineWidth = 1.5;
+    bg.beginPath(); bg.arc(moonX, moonY, 14, 0, Math.PI * 2); bg.stroke();
+    bg.strokeStyle = 'rgba(0,240,255,0.25)'; bg.lineWidth = 1;
+    bg.beginPath(); bg.moveTo(moonX, 0); bg.lineTo(moonX, H * 0.72); bg.stroke();
+    bg.restore();
+
+    // 2. Far Background Distant Megacity Spires (Silhouettes)
+    for (let i = 0; i < 26; i++) {
+      const dw = W / 24 + 4;
+      const dx = i * (W / 25) - 10;
+      const dHeight = H * (.42 + .25 * Math.sin(i * 5.1 + 17));
+      const dy = H - dHeight;
+      bg.fillStyle = (i % 2 === 0) ? '#0c1527' : '#101c34';
+      bg.fillRect(dx, dy, dw, dHeight);
+
+      if (i % 3 === 0) {
+        bg.strokeStyle = '#1b2d4f'; bg.lineWidth = 1;
+        bg.beginPath(); bg.moveTo(dx + dw / 2, dy); bg.lineTo(dx + dw / 2, dy - 18); bg.stroke();
       }
-    } else {
-      // 18 Multi-tier Cyberpunk Skyscrapers with Lit Window Matrices & Holographic Billboards
-      for (let i = 0; i < 18; i++) {
-        const bx = i * (W / 17) - 15;
-        const bHeight = H * (.35 + .3 * Math.sin(i * 7 + 42));
-        const bWidth = W / 18 + 8;
-        const by = H - bHeight;
+    }
 
-        bg.fillStyle = i % 2 === 0 ? '#0a0e1c' : '#0d1326';
-        bg.fillRect(bx, by, bWidth, bHeight);
+    // 3. Mid-Ground Cyberpunk Skyscrapers with Lit Window Matrices & Neon Trims
+    for (let i = 0; i < 18; i++) {
+      const bWidth = W / 17 + 8;
+      const bx = i * (W / 17) - 15;
+      const bHeight = H * (.36 + .32 * Math.sin(i * 7 + 42));
+      const by = H - bHeight;
 
-        // Cyberpunk window matrices in vibrant cyan, amber, magenta, and neon blue
-        for (let wy = by + 20; wy < H * .85; wy += 14) {
-          for (let wx = bx + 6; wx < bx + bWidth - 6; wx += 10) {
-            const seed = (wx * 13 + wy * 17);
-            if (seed % 7 > 2) {
-              const winColor = (seed % 19 === 0) ? '#00f0ff88' : (seed % 23 === 0) ? '#ff2a6d88' : (seed % 11 === 0) ? '#ffe60077' : '#1b2a4a';
-              bg.fillStyle = winColor;
-              bg.fillRect(wx, wy, 4, 6);
-            }
+      // Building Body with crisp architectural contrast
+      bg.fillStyle = i % 2 === 0 ? '#121e35' : '#172643';
+      bg.fillRect(bx, by, bWidth, bHeight);
+
+      // Building Outline & Top Neon Rim
+      bg.strokeStyle = '#22385e'; bg.lineWidth = 1.5;
+      bg.strokeRect(bx, by, bWidth, bHeight);
+      bg.strokeStyle = (i % 3 === 0) ? '#00f0ff66' : (i % 3 === 1) ? '#ff2a6d66' : '#ffe60055';
+      bg.lineWidth = 2;
+      bg.beginPath(); bg.moveTo(bx, by); bg.lineTo(bx + bWidth, by); bg.stroke();
+
+      // Dense Window Matrices in Vibrant Cyberpunk Neon Hues
+      for (let wy = by + 18; wy < H * .82; wy += 13) {
+        for (let wx = bx + 5; wx < bx + bWidth - 5; wx += 9) {
+          const seed = (wx * 17 + wy * 31 + i * 19);
+          if (seed % 5 > 1) {
+            let winColor;
+            const wtype = seed % 37;
+            if (wtype === 0 || wtype === 1) winColor = '#00f0ff';
+            else if (wtype === 2) winColor = '#ff2a6d';
+            else if (wtype === 3) winColor = '#ffe600';
+            else if (wtype === 4) winColor = '#38bdf8';
+            else if (wtype < 16) winColor = '#243a60';
+            else winColor = '#0b1322';
+            bg.fillStyle = winColor;
+            bg.fillRect(wx, wy, 4, 6);
           }
         }
-
-        // Antenna Spire with rooftop neon
-        bg.strokeStyle = '#223454'; bg.lineWidth = 1.5;
-        bg.beginPath(); bg.moveTo(bx + bWidth / 2, by); bg.lineTo(bx + bWidth / 2, by - 28); bg.stroke();
-
-        // Holographic Corporate Billboards atop selected skyscrapers
-        if (i % 4 === 1) {
-          const ads = ['[CYBERDYNE]', '[NEO//GRID]', '[KORE//CORP]', '[A.I. OVERMIND]', '[SYNTH]'];
-          const adText = ads[Math.floor(i / 4) % ads.length];
-          const adColor = (i % 8 === 1) ? '#ff2a6dbb' : '#00f0ffbb';
-          bg.font = 'bold 9px monospace'; bg.fillStyle = adColor; bg.textAlign = 'center';
-          bg.fillText(adText, bx + bWidth / 2, by - 12);
-        }
       }
 
-      // Mid-sky flying synth traffic streams
-      bg.fillStyle = '#ffaa3333';
-      for (let i = 0; i < 6; i++) {
-        bg.fillRect((i * 180 + 40) % W, H * (.38 + (i % 3) * .05), 8, 2);
-      }
+      // Antenna Spires with Crossbars
+      bg.strokeStyle = '#324e7e'; bg.lineWidth = 1.5;
+      bg.beginPath();
+      bg.moveTo(bx + bWidth / 2, by); bg.lineTo(bx + bWidth / 2, by - 30);
+      bg.moveTo(bx + bWidth / 2 - 4, by - 18); bg.lineTo(bx + bWidth / 2 + 4, by - 18);
+      bg.stroke();
 
-      // Terrain polyline & cyberpunk synthwave digital rock strata
+      // Bold Holographic Corporate Billboards
+      if (i % 3 === 1) {
+        const ads = [
+          { text: '[CYBERDYNE]', color: '#00f0ff' },
+          { text: '[NEO-CITADEL]', color: '#ff2a6d' },
+          { text: '[KORE//CORP]', color: '#ffe600' },
+          { text: '[A.I. OVERMIND]', color: '#00f0ff' },
+          { text: '[HEX//TECH]', color: '#39ff14' },
+          { text: '[SHINRA//SYNTH]', color: '#ff2a6d' }
+        ];
+        const ad = ads[Math.floor(i / 3) % ads.length];
+        bg.font = 'bold 9px monospace';
+        bg.fillStyle = ad.color;
+        bg.textAlign = 'center';
+        bg.fillText(ad.text, bx + bWidth / 2, by - 10);
+      }
+    }
+
+    // 4. Mid-Sky Flying Synth Traffic (Aerial Corridors)
+    for (let i = 0; i < 8; i++) {
+      const tx = (i * 210 + 60) % W;
+      const ty = H * (.32 + (i % 4) * .07);
+      bg.fillStyle = (i % 2 === 0) ? '#ffaa3399' : '#00f0ff99';
+      bg.fillRect(tx, ty, 9, 2);
+      bg.fillStyle = 'rgba(255,255,255,0.4)';
+      bg.fillRect(tx + (i % 2 === 0 ? -4 : 9), ty, 4, 2);
+    }
+
+    // 5. Fore-Ground Terrain Polyline & Cyberpunk Digital Rock Strata
+    if (biome === 'naval') {
+      const grad = bg.createLinearGradient(0, H * .72, 0, H);
+      grad.addColorStop(0, '#0e2b54'); grad.addColorStop(1, '#07152b');
+      bg.fillStyle = grad; bg.fillRect(0, H * .74, W, H * .26);
+      for (const isl of islands) {
+        bg.fillStyle = '#172b25';
+        bg.beginPath(); bg.arc(isl.x, H * .76, isl.r, 0, Math.PI, true); bg.fill();
+        bg.strokeStyle = '#00f0ff'; bg.lineWidth = 2; bg.stroke();
+      }
+    } else {
+      // Solid Bedrock Fill Gradient below Terrain Curve
+      const rockGrad = bg.createLinearGradient(0, H * .70, 0, H);
+      rockGrad.addColorStop(0, '#0e172a');
+      rockGrad.addColorStop(1, '#070c17');
       bg.beginPath(); bg.moveTo(0, H);
-      terrain.forEach((y, i) => bg.lineTo(i / 80 * W, y)); bg.lineTo(W, H); bg.closePath();
-      bg.fillStyle = '#0b1120'; bg.fill();
+      terrain.forEach((y, i) => bg.lineTo((i / (terrain.length - 1)) * W, y));
+      bg.lineTo(W, H); bg.closePath();
+      bg.fillStyle = rockGrad; bg.fill();
 
-      // Digital terrain contour grid lines
-      bg.strokeStyle = '#00f0ff22'; bg.lineWidth = 1;
-      for (let gy = H * .72; gy < H * .92; gy += 18) {
+      // Topographic Digital Wireframe Contour Grid Lines across Bedrock
+      bg.strokeStyle = '#00f0ff33'; bg.lineWidth = 1;
+      for (let gy = H * .73; gy < H * .95; gy += 16) {
         bg.beginPath(); bg.moveTo(0, gy); bg.lineTo(W, gy); bg.stroke();
       }
+      for (let gx = 0; gx < W; gx += 40) {
+        bg.strokeStyle = '#00f0ff1a';
+        bg.beginPath(); bg.moveTo(gx, H * .74); bg.lineTo(gx, H); bg.stroke();
+      }
 
-      // Terrain surface neon ridge
-      bg.beginPath(); terrain.forEach((y, i) => i ? bg.lineTo(i / 80 * W, y) : bg.moveTo(0, y));
-      bg.strokeStyle = '#00f0ff'; bg.lineWidth = 2; bg.stroke();
+      // Terrain Surface Glowing Neon Ridge (Aura + Sharp Crest)
+      bg.beginPath();
+      terrain.forEach((y, i) => i ? bg.lineTo((i / (terrain.length - 1)) * W, y) : bg.moveTo(0, y));
+      bg.strokeStyle = '#00f0ff44'; bg.lineWidth = 5; bg.stroke();
+      bg.beginPath();
+      terrain.forEach((y, i) => i ? bg.lineTo((i / (terrain.length - 1)) * W, y) : bg.moveTo(0, y));
+      bg.strokeStyle = '#00f0ff'; bg.lineWidth = 2.5; bg.stroke();
     }
     terrainDirty = false; terrainCacheTime = .1;
   }
@@ -1940,21 +2009,35 @@
     ctx.save();
     if (shake && quality) ctx.translate(rand(-2, 2) * shake / .18, rand(-2, 2) * shake / .18);
 
-    // Blinking Antenna Beacon LEDs in Stratosphere
-    if (biome === 'land') {
-      const blink = Math.floor(clock * 2.5) % 2 === 0;
-      for (let i = 0; i < 18; i++) {
-        const bx = i * (W / 17) - 15;
-        const bHeight = H * (.35 + .3 * Math.sin(i * 7 + 42));
-        const bWidth = W / 18 + 8;
-        const by = H - bHeight;
-        ctx.fillStyle = blink ? (i % 2 === 0 ? '#ff3344' : '#ffffff') : '#441111';
-        ctx.fillRect(bx + bWidth / 2 - 1, by - 29, 3, 3);
+    // Live Glowing Neon Terrain Surface Crest (Dynamically responds to craters & shockwaves)
+    if (biome === 'land' && terrain.length > 1) {
+      ctx.save();
+      if (quality > 0) { ctx.shadowBlur = 8; ctx.shadowColor = '#00f0ff'; }
+      ctx.strokeStyle = '#00f0ff'; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let i = 0; i < terrain.length; i++) {
+        const tx = (i / (terrain.length - 1)) * W, ty = terrain[i];
+        if (i === 0) ctx.moveTo(tx, ty); else ctx.lineTo(tx, ty);
       }
+      ctx.stroke();
+      ctx.restore();
+    }
 
-      // Deep Subterranean Strata & Ambient Gloom
-      ctx.fillStyle = '#060a14cc';
-      ctx.fillRect(0, H * .79, W, H * .21);
+    // Blinking Antenna Beacon LEDs in Stratosphere
+    const blink = Math.floor(clock * 2.5) % 2 === 0;
+    for (let i = 0; i < 18; i++) {
+      const bx = i * (W / 17) - 15;
+      const bHeight = H * (.36 + .32 * Math.sin(i * 7 + 42));
+      const bWidth = W / 17 + 8;
+      const by = H - bHeight;
+      ctx.fillStyle = blink ? (i % 2 === 0 ? '#ff3344' : '#00f0ff') : '#441111';
+      ctx.fillRect(bx + bWidth / 2 - 1, by - 31, 3, 3);
+    }
+
+    // Deep Subterranean Strata & Ambient Gloom (Layer 3 only, strictly below surface terrain)
+    if (biome === 'land') {
+      ctx.fillStyle = '#060a14d0';
+      ctx.fillRect(0, H * .86, W, H * .14);
 
       // Citadel Undercroft Archways
       for (let bi = 0; bi < bases.length; bi++) {
@@ -2099,7 +2182,7 @@
       }
     }
 
-    // Fortified ASCII Outpost Bunkers (Middle Objectives)
+    // Fortified Low-Profile ASCII Pillbox Bunkers (Middle Objectives)
     for (const p of points) {
       const y = groundAt(p.x);
       const ownerColor = p.owner < 0 ? '#7b8799' : COLORS[p.owner];
@@ -2108,82 +2191,71 @@
       const contested = p.progress !== 0 && ((p.progress < 0 && p.owner === 1) || (p.progress > 0 && p.owner === 0));
 
       ctx.save();
-      const bw = 54, bh = 28;
+      const bw = 46, bh = 13;
       const bx = p.x - bw / 2, by = y - bh;
 
-      // Bunker Shadow / Ground Contact
-      ctx.fillStyle = '#080d1a';
-      ctx.fillRect(bx - 4, y - 4, bw + 8, 5);
+      // Solid Foundation Bedrock Berm (anchored seamlessly into terrain ridge)
+      ctx.fillStyle = '#0a101d';
+      ctx.fillRect(bx - 4, y - 2, bw + 8, 8);
 
-      // Cyberpunk Neon Glow for Fortified Bunker Embrasures & Frame
+      // Cyberpunk Neon Glow for Fortified Pillbox Frame
       if (quality > 0) {
         ctx.shadowBlur = 8;
         ctx.shadowColor = ownerColor;
       }
 
-      // Reinforced Concrete Walls
-      ctx.fillStyle = '#101726';
-      ctx.fillRect(bx, by + 8, bw, bh - 8);
-
-      // Sloped Armored Blast Roof
+      // Low-profile sloped armored pillbox glacis
       ctx.beginPath();
-      ctx.moveTo(bx - 3, by + 8);
-      ctx.lineTo(bx + 10, by);
-      ctx.lineTo(bx + bw - 10, by);
-      ctx.lineTo(bx + bw + 3, by + 8);
+      ctx.moveTo(bx - 4, y);
+      ctx.lineTo(bx + 6, by);
+      ctx.lineTo(bx + bw - 6, by);
+      ctx.lineTo(bx + bw + 4, y);
       ctx.closePath();
-      ctx.fillStyle = '#172238';
+      ctx.fillStyle = '#121b2d';
       ctx.fill();
       ctx.strokeStyle = ownerColor;
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Top Communications Mast & Flashing Beacon
-      const mastTopY = by - 16;
+      // Slender Comms Antenna Mast & Holographic Capture Beacon
+      const mastTopY = by - 14;
       ctx.strokeStyle = ownerColor;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(p.x, by);
       ctx.lineTo(p.x, mastTopY);
       ctx.stroke();
-      const beaconOn = contested ? (Math.floor(clock * 6) % 2 === 0) : (Math.floor(clock * 2) % 2 === 0);
+
+      const beaconOn = contested ? (Math.floor(clock * 6) % 2 === 0) : (Math.floor(clock * 2.5) % 2 === 0);
       if (beaconOn) {
         ctx.fillStyle = contested ? '#ffcc00' : ownerColor;
         ctx.beginPath();
-        ctx.arc(p.x, mastTopY, 3, 0, Math.PI * 2);
+        ctx.arc(p.x, mastTopY, 2.5, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // ASCII Text Art Overlay on Bunker Façade
-      ctx.font = 'bold 9px monospace';
+      // ASCII Text Art Overlay on Pillbox Façade
+      ctx.font = 'bold 8px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // Upper Roof Plates ASCII
-      ctx.fillStyle = '#6b7280';
-      ctx.fillText('_/=======\_', p.x, by + 4);
-
-      // Embrasures / Firing Slits with Glowing Interior Neon
+      // Low-profile embrasure & visor slit
       ctx.fillStyle = ownerColor;
-      ctx.fillText('[##]   [##]', p.x, by + 13);
+      ctx.fillText('[#] |==| [#]', p.x, by + 6);
 
-      // Central Armored Blast Hatch
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('|====[O]====|', p.x, by + 22);
-
-      // Bunker Identification Banner
-      ctx.font = 'bold 10px monospace';
+      // Pillbox Objective Tag
+      ctx.font = 'bold 9px monospace';
       ctx.fillStyle = ownerColor;
       const bkrLabel = (p.owner === 0 ? 'RED ' : p.owner === 1 ? 'BLU ' : '') + 'BUNKER-' + p.label;
-      ctx.fillText(bkrLabel, p.x, mastTopY - 7);
+      ctx.fillText(bkrLabel, p.x, mastTopY - 6);
 
-      // Armored Capture Progress Bar along Foundation
-      ctx.fillStyle = '#1b2333';
-      ctx.fillRect(p.x - 24, y - 3, 48, 4);
+      // Armored Capture Progress Bar flush with terrain foundation
+      ctx.fillStyle = '#080d18';
+      ctx.fillRect(p.x - 20, y + 1, 40, 3);
       if (progAbs > 0.02) {
         ctx.fillStyle = progColor;
         if (quality > 0) { ctx.shadowColor = progColor; ctx.shadowBlur = 4; }
-        ctx.fillRect(p.x - 24, y - 3, 48 * progAbs, 4);
+        ctx.fillRect(p.x - 20, y + 1, 40 * progAbs, 3);
       }
 
       ctx.restore();
