@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      20.0.0
+// @version      20.1.0
 // @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini.
 // @author       rohankosur
 // @license      MIT
@@ -738,17 +738,390 @@
       font-size: 14px !important;
     }
 
-    /* Left Navigation Drawer & Sidebar: Translucent Cyberdeck */
-    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, [class*="navigation-drawer"]) {
-      background: rgba(4, 8, 16, 0.85) !important;
-      backdrop-filter: blur(12px) !important;
-      border-right: 1.5px solid rgba(0, 240, 255, 0.4) !important;
-      box-shadow: 2px 0 16px rgba(0, 240, 255, 0.15) !important;
+    /* ==========================================================================
+       7. LEFT NAVIGATION SIDEBAR: 80s OUTRUN CYBERDECK OVERHAUL
+       ========================================================================== */
+
+    /* Main Navigation Drawer Chassis: Translucent Cyberdeck Glass + Laser Conduit Seam */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, .side-nav, [class*="side-nav"], [class*="navigation-drawer"], mat-sidenav) {
+      background: rgba(4, 8, 16, 0.82) !important;
+      background-color: rgba(4, 8, 16, 0.82) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-right: 1.5px solid rgba(0, 240, 255, 0.45) !important;
+      box-shadow: 2px 0 20px rgba(0, 240, 255, 0.22) !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(a, button, [role="button"]):hover {
+
+    /* Strip all solid background fills from inner drawer wrappers */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, mat-sidenav) :is(
+      .mat-drawer-inner-container,
+      [class*="inner-container"],
+      [class*="content-wrapper"],
+      [class*="scrollable"],
+      [class*="nav-content"],
+      [class*="container"]
+    ) {
+      background: transparent !important;
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+
+    /* Sidebar Top Header & Brand Text */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is([class*="title"], [class*="logo-text"], .gemini-logo, [aria-label*="Gemini"]) {
+      background: linear-gradient(135deg, #00f0ff 0%, #ff2a6d 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      letter-spacing: 1px !important;
+      filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)) !important;
+    }
+
+    /* Header Hamburger Menu Button */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]) :is(mat-icon, svg) {
       color: #00f0ff !important;
-      text-shadow: 0 0 6px #00f0ff !important;
-      background: rgba(0, 240, 255, 0.12) !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.7)) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]):hover :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 10px rgba(255, 42, 109, 0.9)) !important;
+      transform: scale(1.15) !important;
+    }
+
+    /* Segmented Mode Switcher: Arcade Dual-Channel Rocker (Chat | Spark) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="tablist"], [class*="mode-switcher"], [class*="tab-group"], [class*="segmented-button"], [class*="toggle-button"]) {
+      background: rgba(10, 16, 32, 0.75) !important;
+      border: 1px solid rgba(0, 240, 255, 0.3) !important;
+      border-radius: 20px !important;
+      padding: 3px !important;
+      margin: 8px 12px 12px 12px !important;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.15) !important;
+    }
+    /* Active Channel Tab (Chat) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="tab"][aria-selected="true"], [class*="segmented-button"] [class*="selected"], [class*="tab"].active) {
+      background: rgba(0, 240, 255, 0.18) !important;
+      border: 1px solid #00f0ff !important;
+      border-radius: 16px !important;
+      color: #00f0ff !important;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.7) !important;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
+      font-weight: bold !important;
+    }
+    /* Inactive Channel Tab */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="tab"][aria-selected="false"], [class*="segmented-button"] button:not([class*="selected"])) {
+      color: #7d9cb8 !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+    }
+    /* Spark "BETA" Microchip Badge */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([class*="badge"], [class*="beta"]) {
+      background: rgba(255, 42, 109, 0.25) !important;
+      color: #ff2a6d !important;
+      border: 1px solid rgba(255, 42, 109, 0.6) !important;
+      border-radius: 4px !important;
+      font-size: 9px !important;
+      font-weight: bold !important;
+      letter-spacing: 0.8px !important;
+      padding: 1px 5px !important;
+      box-shadow: 0 0 6px rgba(255, 42, 109, 0.4) !important;
+    }
+
+    /* "New Chat" Action Button: Primary Mission Initiate */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], a[href="/app"], [class*="new-chat"], button:has(mat-icon[fonticon*="edit"]), button:has(mat-icon[fonticon*="add"])) {
+      background: linear-gradient(135deg, rgba(255, 42, 109, 0.2) 0%, rgba(0, 240, 255, 0.12) 100%) !important;
+      border: 1.5px solid rgba(255, 42, 109, 0.55) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 0 12px rgba(255, 42, 109, 0.25), inset 0 0 8px rgba(255, 42, 109, 0.08) !important;
+      color: #ffe6ef !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 13px !important;
+      font-weight: bold !important;
+      letter-spacing: 0.6px !important;
+      margin: 6px 10px !important;
+      padding: 8px 12px !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], a[href="/app"], [class*="new-chat"], button:has(mat-icon[fonticon*="edit"]), button:has(mat-icon[fonticon*="add"])):hover {
+      border-color: #00f0ff !important;
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.6), inset 0 0 10px rgba(0, 240, 255, 0.15) !important;
+      color: #ffffff !important;
+      transform: translateX(2px) !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], a[href="/app"], [class*="new-chat"]) :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 6px #ff2a6d) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], a[href="/app"], [class*="new-chat"]):hover :is(mat-icon, svg) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 8px #00f0ff) !important;
+    }
+
+    /* Top Nav Items (Search, Daily Brief, Students, Videos, Library, Labs) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"], [class*="link-container"]) :is(a, button, [role="button"]) {
+      color: #c4def6 !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 13px !important;
+      background: transparent !important;
+      border: none !important;
+      border-left: 2px solid transparent !important;
+      border-radius: 4px !important;
+      padding: 7px 12px !important;
+      margin: 2px 6px !important;
+      transition: all 0.18s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"], [class*="link-container"]) :is(a, button, [role="button"]):hover {
+      border-left: 3px solid #00f0ff !important;
+      background: linear-gradient(90deg, rgba(0, 240, 255, 0.14) 0%, rgba(0, 240, 255, 0.02) 100%) !important;
+      color: #00f0ff !important;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6) !important;
+      transform: translateX(3px) !important;
+    }
+    /* Icons in Nav Items */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"]) :is(mat-icon, svg, [fonticon]) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6)) !important;
+      transition: all 0.18s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"]):hover :is(mat-icon, svg, [fonticon]) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.85)) !important;
+      transform: scale(1.15) !important;
+    }
+
+    /* Mainframe Directory Headers: Notebooks & Recents */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="category"],
+      [class*="section-header"],
+      [class*="header-title"],
+      [class*="recents-header"],
+      [class*="notebooks-header"],
+      [class*="collapsible-header"],
+      h2, h3, [role="heading"]
+    ) {
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 11px !important;
+      font-weight: bold !important;
+      color: #ffe600 !important; /* Golden Amber */
+      text-shadow: 0 0 8px rgba(255, 230, 0, 0.6) !important;
+      text-transform: uppercase !important;
+      letter-spacing: 1.6px !important;
+      padding: 12px 10px 6px 10px !important;
+      border-bottom: 1px dashed rgba(0, 240, 255, 0.25) !important;
+      margin: 10px 8px 6px 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    }
+
+    /* History & Conversation List Items: Base */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item
+    ) :is(a, button, [role="button"], [class*="conversation-entry"], [class*="entry-container"]) {
+      color: #cbe9ff !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 13px !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      border-left: 2px solid transparent !important;
+      border-radius: 6px !important;
+      margin: 2px 6px !important;
+      padding: 7px 10px !important;
+      transition: all 0.18s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item
+    ) :is(a, button, [role="button"], [class*="conversation-entry"]) :is(span, p, div, [class*="title"], [class*="text"]) {
+      color: inherit !important;
+      font-family: 'Share Tech Mono', monospace !important;
+    }
+
+    /* Hover on History Items: Hot Magenta Notch & Wash */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item
+    ) :is(a, button, [role="button"], [class*="conversation-entry"]):hover {
+      border-left: 3px solid #ff2a6d !important;
+      background: linear-gradient(90deg, rgba(255, 42, 109, 0.14) 0%, rgba(255, 42, 109, 0.02) 100%) !important;
+      color: #ffe6ef !important;
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.6) !important;
+      transform: translateX(3px) !important;
+    }
+
+    /* Active / Selected Chat Session: Active Data Cartridge */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item,
+      a
+    ):is(.selected, [aria-selected="true"], [aria-current="page"], [class*="active"], [class*="selected"], [activated]),
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item
+    ) :is(.selected, [aria-selected="true"], [aria-current="page"], [class*="active"], [class*="selected"], [activated], [class*="active-item"]) {
+      background: rgba(0, 240, 255, 0.14) !important;
+      backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(0, 240, 255, 0.45) !important;
+      border-left: 3.5px solid #00f0ff !important;
+      border-radius: 6px !important;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25), inset 0 0 8px rgba(0, 240, 255, 0.08) !important;
+      color: #00f0ff !important;
+      font-weight: bold !important;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.6) !important;
+      margin: 3px 6px !important;
+      padding: 7px 10px !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item,
+      a
+    ):is(.selected, [aria-selected="true"], [aria-current="page"], [class*="active"], [class*="selected"], [activated]) :is(span, p, div, [class*="title"], [class*="text"]),
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="conversation-item"],
+      [class*="history-item"],
+      [class*="chat-item"],
+      [class*="recent-item"],
+      [class*="notebook-item"],
+      [role="listitem"],
+      mat-list-item
+    ) :is(.selected, [aria-selected="true"], [aria-current="page"], [class*="active"], [class*="selected"], [activated], [class*="active-item"]) :is(span, p, div, [class*="title"], [class*="text"]) {
+      color: #00f0ff !important;
+      font-weight: bold !important;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.6) !important;
+    }
+
+    /* History Item Context Menu Buttons (More options "...", pin, delete) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="more-menu"],
+      [class*="actions-trigger"],
+      [class*="action-button"],
+      button[aria-label*="More" i],
+      button:has(mat-icon[fonticon*="more"])
+    ) {
+      background: transparent !important;
+      border: none !important;
+      opacity: 0.8 !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="more-menu"],
+      [class*="actions-trigger"],
+      [class*="action-button"],
+      button[aria-label*="More" i]
+    ) :is(mat-icon, svg) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="more-menu"],
+      [class*="actions-trigger"],
+      [class*="action-button"],
+      button[aria-label*="More" i]
+    ):hover :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
+      transform: scale(1.2) !important;
+    }
+
+    /* Bottom User Deck / Operator Profile Module */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      [class*="user-profile"],
+      [class*="footer"],
+      [class*="bottom-section"],
+      [class*="user-info"],
+      [data-test-id*="user"]
+    ) {
+      border-top: 1.5px solid rgba(0, 240, 255, 0.35) !important;
+      background: rgba(5, 10, 22, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      padding: 10px 14px !important;
+      box-shadow: 0 -4px 14px rgba(0, 240, 255, 0.1) !important;
+    }
+
+    /* Operator Avatar HUD Ring */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(img, [class*="avatar"], [class*="user-icon"]) {
+      border: 1.5px solid #00f0ff !important;
+      border-radius: 50% !important;
+      box-shadow: 0 0 8px #00f0ff !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(img, [class*="avatar"], [class*="user-icon"]):hover {
+      box-shadow: 0 0 14px #ff2a6d !important;
+      border-color: #ff2a6d !important;
+      transform: scale(1.08) !important;
+    }
+
+    /* Operator Name ("Rohan Kosur") */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([class*="user-name"], [class*="display-name"]) {
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #ffffff !important;
+      font-weight: bold !important;
+      font-size: 13px !important;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.4) !important;
+    }
+
+    /* Operator Plan Badge ("Pro") */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([class*="plan-name"], [class*="subscription-tier"], [class*="tier"]) {
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #ffe600 !important;
+      font-size: 11px !important;
+      font-weight: bold !important;
+      letter-spacing: 1px !important;
+      text-shadow: 0 0 6px rgba(255, 230, 0, 0.6) !important;
+    }
+
+    /* Settings Gear Button */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="Settings" i], [class*="settings"]) :is(mat-icon, svg) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
+      transition: transform 0.3s ease, color 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="Settings" i], [class*="settings"]):hover :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
+      transform: rotate(90deg) scale(1.15) !important;
     }
 
     /* Response Actions (Thumbs, Copy, Share, Edit) */
@@ -1163,7 +1536,7 @@
     getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '20.0.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.1.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
@@ -1172,7 +1545,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v20.0.0 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.1.0 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
