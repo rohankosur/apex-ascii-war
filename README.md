@@ -1,6 +1,6 @@
-# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.1
+# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.2
 
-[![Version](https://img.shields.io/badge/version-20.1.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
+[![Version](https://img.shields.io/badge/version-20.2.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ff2a6d.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Gemini-ffe600.svg?style=flat-square)](https://gemini.google.com/)
 [![Audio](https://img.shields.io/badge/audio-8--Bit%20Web%20Audio%20Synth-39ff14.svg?style=flat-square)](#-8-bit-web-audio-synthesizer)
@@ -10,16 +10,14 @@
 
 ---
 
-## 🎮 Highlights & New in v20.1.0
+## 🎮 Highlights & New in v20.2.0
 
-- **🕹️ 80s Outrun Left Sidebar Overhaul**: Complete aesthetic transformation of Gemini's left navigation drawer:
-  - **Translucent Cyberdeck Chassis**: Deep navy glass (`rgba(4, 8, 16, 0.82)`) with 14px backdrop blur, allowing background ASCII warfare and city skylines to peek through.
-  - **Laser Conduit Seam**: Glowing electric cyan vertical seam with bloom along the right edge.
-  - **Dual-Channel Rocker Switcher**: Retro toggle for *Chat* vs *Spark* with hot magenta `[BETA]` microchip badge.
-  - **Mission Initiate "New Chat"**: Cyber cartridge button with dual cyan/magenta border and hover transition.
-  - **Mainframe Directory Headers**: Golden amber (`#ffe600`) uppercase headers for `Notebooks` and `Recents` with dashed cyan dividers.
-  - **Active Data Cartridge**: Selected chat session highlighted with a 3.5px neon cyan vertical bar, soft cyan wash, and glowing text.
-  - **Operator Profile Dock**: Cyan HUD avatar ring, golden amber `[PRO]` tier badge, and rotating cyan settings gear on hover.
+- **🧹 Clean Cyberdeck Sidebar & Zero Rogue Borders**: Eradicated all rigid enclosing boxes, nested double frames, and smudged red pill badges across Gemini's sidebar:
+  - **Clean Monospace Rows**: List items render completely borderless with soft ice-blue text. Hovering displays a sleek left-notch sweep without enclosing boxes.
+  - **Single Active Data Cartridge**: The active session is highlighted purely by a 3.5px neon cyan vertical bar and soft cyan wash (no nested boxes).
+  - **Crisp Mainframe Headers**: `Notebooks` and `Recents` directory headers appear in clean golden amber with dashed cyan dividers (no blurry red pills).
+  - **Streamlined Operator Dock**: Circular cyan avatar ring with zero outer concentric circles or nested button ovals.
+  - **Translucent Cyberdeck Chassis**: Deep navy glass (`rgba(4, 8, 16, 0.82)`) with 14px backdrop blur and electric cyan conduit seam.
 - **⚡ Interactive Cyberdeck HUD Console**: An on-screen floating retro arcade console pinned discreetly to the corner. Expand it anytime to pause, reset, switch speed (0.5x, 1x, 2x), adjust quality, toggle CRT scanlines, toggle sound effects, change biomes, or view live Citadel HP and match records.
 - **🔊 Pure Web Audio 8-Bit Synthesizer Engine**: 100% self-contained algorithmic synthesizer producing authentic NES/arcade laser sweeps, filtered explosive booms, flak crackle, emergency sirens, and triumphant victory arpeggios. *Muted by default* — toggle on with a single click or `Alt + Shift + M`.
 - **🏆 Persistent Match Scoreboard**: Red vs Blue Citadel match history saved across browser refreshes via `localStorage`.
@@ -119,8 +117,8 @@ The sound engine is synthesized in real time using the native browser `AudioCont
 ### One-Click Install (Tampermonkey / Violentmonkey)
 1. Install [Tampermonkey](https://www.tampermonkey.net/) in Chrome, Brave, or Edge.
 2. Click this direct raw link:  
-   👉 **[Install apex-ascii-war.user.js (v20.1.0)](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js)**
-3. Tampermonkey will prompt you to install/update to **v20.1.0**. Click **Install** (or **Update**).
+   👉 **[Install apex-ascii-war.user.js (v20.2.0)](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js)**
+3. Tampermonkey will prompt you to install/update to **v20.2.0**. Click **Install** (or **Update**).
 4. Navigate to [`https://gemini.google.com/`](https://gemini.google.com/) and refresh the page!
 
 ---
