@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (Cyberpunk Bloom, Bunker Warfare & Citadel Overhaul)
 // @namespace    neon.ascii.war
-// @version      17.0.0
+// @version      18.0.0
 // @description  Cyberpunk Neon Bloom, Fortified Middle Bunkers, Objective Assault AI, Air Fleet Expansion, Citadel Defense Batteries, Full Tri-Sphere Subterranean Warfare, and Zero Trajectory Lines.
 // @match        https://gemini.google.com/*
+// @updateURL    https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js
+// @downloadURL  https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js
 // @run-at       document-idle
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
@@ -337,10 +339,11 @@
 
     /* --- CHAT MESSAGES: TRANSPARENT & CLEAN (NO GIANT SCREEN BORDERS) --- */
 
-    /* Model Response: Completely transparent, NO giant outer bounding box! */
-    html.apex-war-enabled :is(.model-response-text, [class*="model-response-text"], [data-test-id="model-response"], .response-content) {
+    /* Model Response: 100% transparent, NO giant outer bounding box! */
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"], [data-test-id*="model-response"], .response-content, message-content) {
       background: transparent !important;
       border: none !important;
+      outline: none !important;
       box-shadow: none !important;
       font-family: 'Share Tech Mono', monospace !important;
       color: #e4f7ff !important;
@@ -351,42 +354,43 @@
 
     /* User Query Bubbles: Sleek Translucent Synthwave Glass */
     html.apex-war-enabled :is(.user-query, [class*="user-query"], [data-test-id="user-query"]) {
-      background: rgba(22, 10, 32, 0.42) !important;
+      background: rgba(22, 10, 32, 0.35) !important;
       backdrop-filter: blur(6px) !important;
-      border: 1px solid rgba(255, 42, 109, 0.55) !important;
+      border: 1px solid rgba(255, 42, 109, 0.5) !important;
       border-radius: 6px !important;
-      box-shadow: 0 0 10px rgba(255, 42, 109, 0.25) !important;
+      box-shadow: 0 0 8px rgba(255, 42, 109, 0.2) !important;
       font-family: 'Share Tech Mono', monospace !important;
       color: #ffe6ef !important;
       letter-spacing: 0.4px !important;
       padding: 12px 16px !important;
     }
 
-    /* --- CODE BLOCKS: TRANSLUCENT GLASS (SINGLE BORDER, DOES NOT BLOCK BACKGROUND) --- */
+    /* --- CODE BLOCKS: ULTRA-CLEAN TRANSLUCENT GLASS (ZERO NESTED BORDERS) --- */
 
-    /* Target ONLY the outer code block wrapper: Single crisp border, translucent background */
-    html.apex-war-enabled :is(.code-block, [class*="code-block-wrapper"], div:has(> pre > code)) {
-      background: rgba(3, 8, 16, 0.48) !important;
+    /* Target ONLY outer code block container: single subtle green frame, 35% translucent fill */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block-wrapper"], div:has(> pre > code)) {
+      background: rgba(2, 6, 14, 0.35) !important;
       backdrop-filter: blur(8px) !important;
-      border: 1px solid #39ff14 !important;
+      border: 1px solid rgba(57, 255, 20, 0.55) !important;
       border-radius: 4px !important;
-      box-shadow: 0 0 12px rgba(57, 255, 20, 0.18) !important;
-      margin: 12px 0 !important;
+      box-shadow: none !important;
+      margin: 10px 0 !important;
       overflow: hidden !important;
     }
 
-    /* Reset ALL nested elements inside code blocks (Pre, Code, Headers) to ZERO borders */
-    html.apex-war-enabled :is(.code-block, [class*="code-block-wrapper"], div:has(> pre > code)) :is(pre, code, div, header) {
+    /* Strictly strip borders, outlines & shadows from ALL child elements inside code blocks */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block-wrapper"], div:has(> pre > code)) :is(*, pre, code, div, header) {
       border: none !important;
+      outline: none !important;
       box-shadow: none !important;
       background: transparent !important;
       background-color: transparent !important;
     }
 
     /* Code Block Header (Language tag, copy button) */
-    html.apex-war-enabled :is(.code-block, [class*="code-block-wrapper"]) :is(.header, [class*="header"], [class*="decoration"]) {
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block-wrapper"]) :is(.header, [class*="header"], [class*="decoration"]) {
       background: rgba(57, 255, 20, 0.08) !important;
-      border-bottom: 1px solid rgba(57, 255, 20, 0.3) !important;
+      border-bottom: 1px solid rgba(57, 255, 20, 0.25) !important;
       color: #39ff14 !important;
       font-family: 'Share Tech Mono', monospace !important;
     }
@@ -399,13 +403,17 @@
       font-size: 16px !important;
     }
 
-    /* Inline Code (e.g. yabai in text): NO borders, soft badge */
-    html.apex-war-enabled :not(pre) > code {
-      background: rgba(57, 255, 20, 0.14) !important;
+    /* Inline Code (e.g. yabai, Cmd + Shift + F in text): NO borders, NO button box */
+    html.apex-war-enabled :not(pre) > code,
+    html.apex-war-enabled p code,
+    html.apex-war-enabled li code {
+      background: rgba(57, 255, 20, 0.12) !important;
       border: none !important;
+      outline: none !important;
       box-shadow: none !important;
       border-radius: 3px !important;
       padding: 1px 5px !important;
+      color: #39ff14 !important;
       font-size: 15px !important;
     }
 
@@ -478,7 +486,7 @@
     },
     stats() {
       return {
-        version: '17.0.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '18.0.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1)
@@ -486,6 +494,7 @@
     }
   };
   window[KEY] = api;
+  console.log('%c[Apex ASCII War] v18.0.0 ACTIVE - High Transparency & Clean Borders Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
