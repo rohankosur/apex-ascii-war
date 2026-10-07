@@ -165,34 +165,78 @@
       inset: 0;
       z-index: 999999;
       pointer-events: none;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
-                  radial-gradient(circle at 50% 50%, transparent 68%, rgba(0, 0, 0, 0.45) 100%);
+      background:
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
+        radial-gradient(circle at 50% 50%, transparent 64%, rgba(0, 0, 0, 0.62) 100%);
       background-size: 100% 3px, 100% 100%;
-      opacity: 0.55;
+      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.8), inset 0 0 16px rgba(0, 240, 255, 0.12);
+      opacity: 0.65;
     }
 
-    /* Gemini Hero Greeting: 'Any new ideas to explore?' */
+    /* Gemini Hero Greeting: 80s Outrun Arcade Title Screen */
     html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], h1, .title, .greeting-title, [class*="greeting"]) {
       font-family: 'VT323', monospace !important;
-      font-size: 2.8rem !important;
-      letter-spacing: 4px !important;
-      color: #00f0ff !important;
-      text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 24px rgba(0, 240, 255, 0.4) !important;
+      font-size: 3.4rem !important;
+      letter-spacing: 5px !important;
+      background: linear-gradient(180deg, #ffffff 0%, #00f0ff 45%, #ff2a6d 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.85)) drop-shadow(0 0 26px rgba(255, 42, 109, 0.6)) !important;
       text-transform: uppercase !important;
+      text-align: center !important;
+      display: block !important;
+    }
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], h1, .title, .greeting-title, [class*="greeting"])::after {
+      content: '►► 1P CO-OP CYBERDECK // INSERT COIN TO INITIATE ◄◄';
+      display: block;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 13px !important;
+      letter-spacing: 4px !important;
+      color: #ffe600 !important;
+      text-shadow: 0 0 8px rgba(255, 230, 0, 0.8), 0 0 18px rgba(255, 42, 109, 0.5) !important;
+      margin-top: 10px !important;
+      -webkit-text-fill-color: #ffe600 !important;
+      animation: arcadePulse 2.2s infinite ease-in-out;
+    }
+    @keyframes arcadePulse {
+      0%, 100% { opacity: 0.95; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.99); }
     }
 
-    /* Central Input Bar: 80s Cyberdeck Console */
-    html.apex-war-enabled :is(.input-area, .input-container, .input-box, chat-window-input, [class*="input-area"], [class*="input-box"]) {
-      background: rgba(6, 10, 22, 0.88) !important;
-      backdrop-filter: blur(10px) !important;
-      border: 1.5px solid #00f0ff !important;
-      border-radius: 4px !important;
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.1) !important;
-      transition: border-color 0.2s, box-shadow 0.2s !important;
+    /* --- INPUT CHASSIS OVERHAUL (ZERO WEIRD DOUBLE BORDERS) --- */
+
+    /* Ensure outer structural wrappers are transparent with NO borders or shadows */
+    html.apex-war-enabled :is(chat-window-input, .input-area, .input-container, .input-area-container) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
     }
-    html.apex-war-enabled :is(.input-area:focus-within, .input-container:focus-within, [class*="input-area"]:focus-within) {
+
+    /* Target ONLY the single primary input bar pill */
+    html.apex-war-enabled div.input-box,
+    html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child {
+      background: rgba(5, 9, 20, 0.90) !important;
+      backdrop-filter: blur(14px) !important;
+      border: 1.5px solid #00f0ff !important;
+      border-radius: 8px !important;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.38), inset 0 0 12px rgba(0, 240, 255, 0.08) !important;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+    }
+
+    /* Focused Chassis: Electric Hot Magenta Overdrive */
+    html.apex-war-enabled div.input-box:focus-within,
+    html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child:focus-within {
       border-color: #ff2a6d !important;
-      box-shadow: 0 0 20px rgba(255, 42, 109, 0.5), inset 0 0 12px rgba(255, 42, 109, 0.15) !important;
+      box-shadow: 0 0 26px rgba(255, 42, 109, 0.65), inset 0 0 16px rgba(255, 42, 109, 0.16) !important;
+    }
+
+    /* Strip rogue borders, outlines and backgrounds from inner textfields and containers */
+    html.apex-war-enabled div.input-box :is(div, span, section, p, form, rich-textarea, .text-input-field) {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background-color: transparent !important;
     }
 
     /* Input text formatting */
@@ -203,58 +247,152 @@
       letter-spacing: 0.8px !important;
       caret-color: #00f0ff !important;
     }
-    html.apex-war-enabled :is(.send-button:not([disabled]), [aria-label*="Send"]:not([disabled])) {
-      box-shadow: 0 0 12px #00f0ff !important;
+
+    /* --- RETRO ARCADE ICONS & BUTTONS OVERHAUL --- */
+
+    /* 1. Global Navigation Drawer & Sidebar Icons (Left side) */
+    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, .side-nav, header) :is(mat-icon, svg, [role="button"] mat-icon) {
       color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.75)) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(button:hover, a:hover, [role="button"]:hover) :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 10px rgba(255, 42, 109, 0.95)) !important;
+      transform: scale(1.15) !important;
+    }
+
+    /* 2. Top-Left Sparkle Gemini Logo: Radiant Neon Cyber Glow */
+    html.apex-war-enabled :is([class*="sparkle"], [aria-label*="Gemini"], [class*="logo"] svg, .bard-logo svg, chat-app header svg) {
+      filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 16px #ff2a6d) hue-rotate(180deg) saturate(2.5) !important;
+      transition: filter 0.3s ease !important;
+    }
+    html.apex-war-enabled :is([class*="sparkle"], [aria-label*="Gemini"], [class*="logo"] svg, .bard-logo svg):hover {
+      filter: drop-shadow(0 0 14px #ff2a6d) drop-shadow(0 0 24px #00f0ff) hue-rotate(200deg) saturate(3) !important;
+    }
+
+    /* 3. Input Bar Utility Buttons (+ Attach, Mic, Tools) */
+    html.apex-war-enabled div.input-box :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]) :is(mat-icon, svg) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.75)) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled div.input-box :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]):hover :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 9px rgba(255, 42, 109, 0.95)) !important;
+      transform: scale(1.15) !important;
+    }
+
+    /* 4. Model Picker Pill: Vintage Arcade Cartridge Badge */
+    html.apex-war-enabled :is([data-test-id*="model"], [class*="model-picker"], [class*="model-select"], button:has([class*="model"]), button[aria-haspopup="menu"]) {
+      background: rgba(0, 240, 255, 0.08) !important;
+      border: 1px solid rgba(0, 240, 255, 0.45) !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.25) !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 13px !important;
+      color: #00f0ff !important;
+      padding: 3px 9px !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is([data-test-id*="model"], [class*="model-picker"], [class*="model-select"]):hover {
+      border-color: #ff2a6d !important;
+      box-shadow: 0 0 12px rgba(255, 42, 109, 0.45) !important;
+      color: #ff2a6d !important;
+    }
+    html.apex-war-enabled :is([data-test-id*="model"], [class*="model-picker"], [class*="model-select"]) * {
+      color: inherit !important;
+      fill: currentColor !important;
+      font-family: 'Share Tech Mono', monospace !important;
+    }
+
+    /* 5. Send Button: 80s Arcade Fire Button (Replaces generic blue circle) */
+    html.apex-war-enabled :is(.send-button, [aria-label*="Send" i], [data-test-id*="send"], button:has(mat-icon[fonticon="send"])) {
+      background: linear-gradient(135deg, #ff2a6d 0%, #aa0055 100%) !important;
+      border: 1px solid #ff2a6d !important;
+      border-radius: 6px !important;
+      box-shadow: 0 0 14px rgba(255, 42, 109, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.3) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(.send-button, [aria-label*="Send" i], [data-test-id*="send"]) :is(mat-icon, svg) {
+      color: #ffffff !important;
+      fill: #ffffff !important;
+      filter: drop-shadow(0 0 4px #ffffff) !important;
+    }
+    html.apex-war-enabled :is(.send-button:not([disabled]):hover, [aria-label*="Send" i]:not([disabled]):hover) {
+      box-shadow: 0 0 24px #ff2a6d, 0 0 12px #00f0ff !important;
+      transform: scale(1.12) !important;
+    }
+    html.apex-war-enabled :is(.send-button[disabled], [aria-label*="Send" i][disabled]) {
+      opacity: 0.35 !important;
+      filter: grayscale(0.8) !important;
+      box-shadow: none !important;
     }
 
     /* Chat Messages: Operator vs Mainframe */
     html.apex-war-enabled :is(.user-query, [class*="user-query"], [data-test-id="user-query"]) {
-      background: rgba(14, 8, 20, 0.85) !important;
+      background: rgba(18, 8, 26, 0.88) !important;
       border: 1px solid #ff2a6d !important;
-      border-radius: 4px !important;
-      box-shadow: 0 0 10px rgba(255, 42, 109, 0.25) !important;
+      border-radius: 6px !important;
+      box-shadow: 0 0 12px rgba(255, 42, 109, 0.3) !important;
       font-family: 'Share Tech Mono', monospace !important;
       color: #ffd6e0 !important;
       letter-spacing: 0.5px !important;
-      padding: 12px 16px !important;
+      padding: 14px 18px !important;
     }
     html.apex-war-enabled :is(.model-response-text, [class*="model-response-text"], [data-test-id="model-response"]) {
-      background: rgba(6, 12, 26, 0.85) !important;
+      background: rgba(5, 12, 28, 0.88) !important;
       border: 1px solid #00f0ff !important;
-      border-radius: 4px !important;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.2) !important;
+      border-radius: 6px !important;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.25) !important;
       font-family: 'Share Tech Mono', monospace !important;
       color: #e0f8ff !important;
       letter-spacing: 0.5px !important;
-      padding: 12px 16px !important;
-      line-height: 1.6 !important;
+      padding: 14px 18px !important;
+      line-height: 1.65 !important;
     }
 
     /* Code Blocks: Genuine Matrix Green Phosphor Terminal */
     html.apex-war-enabled :is(pre, code, .code-block, .code-container, [class*="code-block"]) {
       font-family: 'VT323', 'Courier New', monospace !important;
-      background: #03050a !important;
+      background: #020509 !important;
       border: 1px solid #39ff14 !important;
-      border-radius: 2px !important;
+      border-radius: 3px !important;
       color: #39ff14 !important;
-      text-shadow: 0 0 4px rgba(57, 255, 20, 0.5) !important;
-      box-shadow: 0 0 12px rgba(57, 255, 20, 0.15) !important;
-      font-size: 15px !important;
+      text-shadow: 0 0 6px rgba(57, 255, 20, 0.55) !important;
+      box-shadow: 0 0 14px rgba(57, 255, 20, 0.18) !important;
+      font-size: 16px !important;
     }
 
     /* Left Navigation Drawer & Sidebar */
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, [class*="navigation-drawer"]) {
-      background: rgba(4, 8, 16, 0.92) !important;
-      backdrop-filter: blur(10px) !important;
-      border-right: 1.5px solid rgba(0, 240, 255, 0.4) !important;
-      box-shadow: 2px 0 15px rgba(0, 240, 255, 0.15) !important;
+      background: rgba(4, 8, 16, 0.94) !important;
+      backdrop-filter: blur(12px) !important;
+      border-right: 1.5px solid rgba(0, 240, 255, 0.45) !important;
+      box-shadow: 2px 0 18px rgba(0, 240, 255, 0.18) !important;
       font-family: 'Share Tech Mono', monospace !important;
     }
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(a, button, [role="button"]):hover {
       color: #00f0ff !important;
       text-shadow: 0 0 6px #00f0ff !important;
-      background: rgba(0, 240, 255, 0.1) !important;
+      background: rgba(0, 240, 255, 0.12) !important;
+    }
+
+    /* Response Actions (Thumbs, Copy, Share, Edit) */
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]) :is(mat-icon, svg) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.5)) !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):hover :is(mat-icon, svg) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.8)) !important;
     }
 
     /* Scrollbars: 80s Neon Cyber Sliders */
@@ -1990,14 +2128,35 @@
   }
 
   function paintTerrain() {
-    // 1. Synthwave Deep Night Sky Gradient
-    const skyGrad = bg.createLinearGradient(0, 0, 0, H * .82);
-    skyGrad.addColorStop(0, '#03050c');
-    skyGrad.addColorStop(0.35, '#081022');
-    skyGrad.addColorStop(0.70, '#101b38');
-    skyGrad.addColorStop(1, '#18284e');
+    // 1. Synthwave Deep Twilight Horizon Gradient
+    const skyGrad = bg.createLinearGradient(0, 0, 0, H * .85);
+    skyGrad.addColorStop(0, '#02030a');
+    skyGrad.addColorStop(0.35, '#070b20');
+    skyGrad.addColorStop(0.58, '#190a34'); // deep synthwave violet
+    skyGrad.addColorStop(0.78, '#3d0c48'); // glowing neon magenta twilight dusk
+    skyGrad.addColorStop(0.92, '#121e3c');
+    skyGrad.addColorStop(1, '#0a1020');
     bg.fillStyle = skyGrad;
     bg.fillRect(0, 0, W, H);
+
+    // 1980s Retro Synthwave Outrun Sun on Horizon (Setting behind the Megacity)
+    bg.save();
+    const sunX = W * 0.50, sunY = H * 0.58, sunR = Math.min(W * 0.17, 125);
+    const sunGrad = bg.createLinearGradient(sunX, sunY - sunR, sunX, sunY + sunR);
+    sunGrad.addColorStop(0, '#ffe600');
+    sunGrad.addColorStop(0.42, '#ff4400');
+    sunGrad.addColorStop(1, '#ff2a6d');
+    bg.fillStyle = sunGrad;
+    bg.beginPath(); bg.arc(sunX, sunY, sunR, 0, Math.PI * 2); bg.fill();
+
+    // Sliced Horizontal Blinds across lower half of the Outrun Sun
+    bg.fillStyle = '#0a0d1e';
+    for (let sl = 0; sl < 8; sl++) {
+      const sliceY = sunY + (sl / 8) * sunR;
+      const sliceH = 2.5 + sl * 1.5;
+      bg.fillRect(sunX - sunR - 15, sliceY, (sunR + 15) * 2, sliceH);
+    }
+    bg.restore();
 
     // Distant Neon Data-Moon & Orbital Space Elevator Tether
     bg.save();
@@ -2076,12 +2235,13 @@
       // Bold Holographic Corporate Billboards
       if (i % 3 === 1) {
         const ads = [
-          { text: '[CYBERDYNE]', color: '#00f0ff' },
-          { text: '[NEO-CITADEL]', color: '#ff2a6d' },
-          { text: '[KORE//CORP]', color: '#ffe600' },
-          { text: '[A.I. OVERMIND]', color: '#00f0ff' },
-          { text: '[HEX//TECH]', color: '#39ff14' },
-          { text: '[SHINRA//SYNTH]', color: '#ff2a6d' }
+          { text: '[NEO-TOKYO 1984]', color: '#00f0ff' },
+          { text: '[アキラ // AKIRA]', color: '#ff2a6d' },
+          { text: '[80s ARCADE ZONE]', color: '#ffe600' },
+          { text: '[TETSUO // TECH]', color: '#00f0ff' },
+          { text: '[CYBERDYNE SYS]', color: '#39ff14' },
+          { text: '[MATRIX//OVERDRIVE]', color: '#ff2a6d' },
+          { text: '[HIGH SCORE 999990]', color: '#ffe600' }
         ];
         const ad = ads[Math.floor(i / 3) % ads.length];
         bg.font = 'bold 9px monospace';
@@ -2147,6 +2307,32 @@
     ctx.globalAlpha = 1; ctx.drawImage(backdrop, 0, 0);
     ctx.save();
     if (shake && quality) ctx.translate(rand(-2, 2) * shake / .18, rand(-2, 2) * shake / .18);
+
+    // Atmospheric Sweeping Volumetric Rooftop Searchlights
+    if (quality > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const spots = [
+        { x: W * 0.22, speed: 0.65, color: 'rgba(0, 240, 255, 0.045)', maxAngle: 0.38 },
+        { x: W * 0.76, speed: 0.52, color: 'rgba(255, 42, 109, 0.045)', maxAngle: 0.35 },
+        { x: W * 0.50, speed: 0.80, color: 'rgba(0, 240, 255, 0.035)', maxAngle: 0.28 }
+      ];
+      for (const sp of spots) {
+        const sy = groundAt(sp.x) - 130;
+        const ang = -Math.PI / 2 + Math.sin(clock * sp.speed) * sp.maxAngle;
+        const len = H * 0.82;
+        const ex1 = sp.x + Math.cos(ang - 0.06) * len, ey1 = sy + Math.sin(ang - 0.06) * len;
+        const ex2 = sp.x + Math.cos(ang + 0.06) * len, ey2 = sy + Math.sin(ang + 0.06) * len;
+        ctx.fillStyle = sp.color;
+        ctx.beginPath();
+        ctx.moveTo(sp.x, sy);
+        ctx.lineTo(ex1, ey1);
+        ctx.lineTo(ex2, ey2);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
 
     // Live Glowing Neon Terrain Surface Crest (Dynamically responds to craters & shockwaves)
     if (biome === 'land' && terrain.length > 1) {
@@ -2599,14 +2785,31 @@
       ctx.fillText(c.text, c.x, c.y);
     }
 
-    // ── TOP COMMAND TERMINAL HUD & AIR SUPERIORITY ──
+    // ── 1980s RETRO ARCADE MARQUEE & TOP COMMAND HUD ──
     const redAir = units.filter(u => u.flying && u.team === 0).length;
     const blueAir = units.filter(u => u.flying && u.team === 1).length;
     const totalAir = Math.max(1, redAir + blueAir);
     const airRatio = redAir / totalAir;
 
+    // Left Arcade Status: 1UP & Credits
+    ctx.save();
+    ctx.font = 'bold 11px monospace';
+    ctx.fillStyle = '#ffe600'; ctx.textAlign = 'left';
+    ctx.fillText('★ 1UP 084290 ★', 22, 24);
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillText('CREDIT 02', 155, 24);
+
+    // Right Arcade Status: High Score & Blinking INSERT COIN
+    ctx.fillStyle = '#ffe600'; ctx.textAlign = 'right';
+    ctx.fillText('HIGH SCORE 999990', W - 185, 24);
+    const blinkCoin = Math.sin(clock * 5) > 0;
+    ctx.fillStyle = blinkCoin ? '#ff2a6d' : '#6b1130';
+    ctx.fillText(blinkCoin ? '► INSERT COIN ◄' : '► 1P READY ◄', W - 80, 24);
+    ctx.restore();
+
+    // Central Air Superiority & Frontline Siege Terminal
     ctx.fillStyle = '#060810ee'; ctx.fillRect(W / 2 - 210, 8, 420, 24);
-    ctx.strokeStyle = '#223454'; ctx.strokeRect(W / 2 - 210, 8, 420, 24);
+    ctx.strokeStyle = '#00f0ff88'; ctx.lineWidth = 1; ctx.strokeRect(W / 2 - 210, 8, 420, 24);
     ctx.fillStyle = COLORS[0]; ctx.fillRect(W / 2 - 208, 10, 416 * airRatio, 4);
     ctx.fillStyle = COLORS[1]; ctx.fillRect(W / 2 - 208 + 416 * airRatio, 10, 416 * (1 - airRatio), 4);
 
