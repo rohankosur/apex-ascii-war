@@ -138,27 +138,39 @@
   const style = GM_addStyle(`
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
 
+    /* Global Typography & Deep Transparency */
     html.apex-war-enabled {
       background: #04060e !important;
-      font-family: 'Share Tech Mono', 'VT323', monospace !important;
+      font-family: 'Share Tech Mono', monospace !important;
     }
     html.apex-war-enabled body {
       background: transparent !important;
       isolation: isolate;
-      font-family: 'Share Tech Mono', 'VT323', monospace !important;
+      font-family: 'Share Tech Mono', monospace !important;
     }
     html.apex-war-enabled :is(chat-app, bard-app) {
       position: relative;
       z-index: 1;
     }
-    html.apex-war-enabled :is(chat-app, bard-app, main, .page-content, .main-content, .conversation-container) {
+    /* Guarantee that NO parent containers block out the background */
+    html.apex-war-enabled :is(chat-app, bard-app, main, .page-content, .main-content, .conversation-container, infinite-scroller, .chat-history, [class*="conversation"]) {
       background-color: transparent !important;
       background-image: none !important;
+      background: transparent !important;
       --gem-sys-color--surface: transparent;
       --gem-sys-color--background: transparent;
     }
 
-    /* 80s CRT Scanline & Phosphor Vignette Overlay */
+    /* Preserve Icon Font Ligatures (Prevents [u, _a], n glitches) */
+    html.apex-war-enabled :is(mat-icon, .google-symbols, .material-symbols-outlined, .material-symbols-rounded, .material-icons, [fonticon]) {
+      font-family: 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons' !important;
+      font-style: normal !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+      direction: ltr !important;
+    }
+
+    /* Subtle 80s CRT Scanline & Phosphor Vignette (Transparent, does not darken background) */
     html.apex-war-enabled::after {
       content: ' ';
       position: fixed;
@@ -166,11 +178,11 @@
       z-index: 999999;
       pointer-events: none;
       background:
-        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
-        radial-gradient(circle at 50% 50%, transparent 64%, rgba(0, 0, 0, 0.62) 100%);
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%),
+        radial-gradient(circle at 50% 50%, transparent 70%, rgba(0, 0, 0, 0.45) 100%);
       background-size: 100% 3px, 100% 100%;
-      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.8), inset 0 0 16px rgba(0, 240, 255, 0.12);
-      opacity: 0.65;
+      box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.6);
+      opacity: 0.42;
     }
 
     /* Gemini Hero Greeting: 80s Outrun Arcade Title Screen */
@@ -203,9 +215,9 @@
       50% { opacity: 0.55; transform: scale(0.99); }
     }
 
-    /* --- INPUT CHASSIS OVERHAUL (ZERO WEIRD DOUBLE BORDERS) --- */
+    /* --- INPUT CHASSIS: SINGLE CLEAN PILL (NO WEIRD BUTTON BOXES) --- */
 
-    /* Ensure outer structural wrappers are transparent with NO borders or shadows */
+    /* Reset all outer and parent wrappers */
     html.apex-war-enabled :is(chat-window-input, .input-area, .input-container, .input-area-container) {
       background: transparent !important;
       border: none !important;
@@ -213,29 +225,30 @@
       outline: none !important;
     }
 
-    /* Target ONLY the single primary input bar pill */
+    /* Single Outer Cyberdeck Input Chassis */
     html.apex-war-enabled div.input-box,
     html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child {
-      background: rgba(5, 9, 20, 0.90) !important;
-      backdrop-filter: blur(14px) !important;
+      background: rgba(5, 9, 20, 0.62) !important;
+      backdrop-filter: blur(12px) !important;
       border: 1.5px solid #00f0ff !important;
       border-radius: 8px !important;
-      box-shadow: 0 0 16px rgba(0, 240, 255, 0.38), inset 0 0 12px rgba(0, 240, 255, 0.08) !important;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.35), inset 0 0 10px rgba(0, 240, 255, 0.06) !important;
       transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
     }
 
-    /* Focused Chassis: Electric Hot Magenta Overdrive */
+    /* Focus State: Hot Magenta */
     html.apex-war-enabled div.input-box:focus-within,
     html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child:focus-within {
       border-color: #ff2a6d !important;
-      box-shadow: 0 0 26px rgba(255, 42, 109, 0.65), inset 0 0 16px rgba(255, 42, 109, 0.16) !important;
+      box-shadow: 0 0 22px rgba(255, 42, 109, 0.6), inset 0 0 14px rgba(255, 42, 109, 0.12) !important;
     }
 
-    /* Strip rogue borders, outlines and backgrounds from inner textfields and containers */
-    html.apex-war-enabled div.input-box :is(div, span, section, p, form, rich-textarea, .text-input-field) {
+    /* All inner containers and buttons inside the input box: NO borders, NO rogue boxes! */
+    html.apex-war-enabled div.input-box :is(div, span, section, p, form, rich-textarea, .text-input-field, button, [role="button"]) {
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
+      background: transparent !important;
       background-color: transparent !important;
     }
 
@@ -248,74 +261,61 @@
       caret-color: #00f0ff !important;
     }
 
-    /* --- RETRO ARCADE ICONS & BUTTONS OVERHAUL --- */
+    /* Model Selector (Flash dropdown) inside input box: clean text, no box */
+    html.apex-war-enabled div.input-box :is([data-test-id*="model"], [class*="model-picker"]) {
+      color: #00f0ff !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 13px !important;
+      opacity: 0.85;
+      padding: 0 4px !important;
+    }
+    html.apex-war-enabled div.input-box :is([data-test-id*="model"], [class*="model-picker"]):hover {
+      opacity: 1;
+      color: #ff2a6d !important;
+    }
 
-    /* 1. Global Navigation Drawer & Sidebar Icons (Left side) */
-    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, .side-nav, header) :is(mat-icon, svg, [role="button"] mat-icon) {
+    /* --- RETRO ARCADE ICONS & ACTION BUTTONS --- */
+
+    /* Global Navigation Drawer & Sidebar Icons */
+    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, .side-nav, header) :is(mat-icon, svg) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
-      filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.75)) !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
       transition: all 0.2s ease !important;
     }
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(button:hover, a:hover, [role="button"]:hover) :is(mat-icon, svg) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
-      filter: drop-shadow(0 0 10px rgba(255, 42, 109, 0.95)) !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
       transform: scale(1.15) !important;
     }
 
-    /* 2. Top-Left Sparkle Gemini Logo: Radiant Neon Cyber Glow */
+    /* Top-Left Sparkle Gemini Logo */
     html.apex-war-enabled :is([class*="sparkle"], [aria-label*="Gemini"], [class*="logo"] svg, .bard-logo svg, chat-app header svg) {
-      filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 16px #ff2a6d) hue-rotate(180deg) saturate(2.5) !important;
+      filter: drop-shadow(0 0 6px #00f0ff) drop-shadow(0 0 12px #ff2a6d) hue-rotate(180deg) saturate(2.5) !important;
       transition: filter 0.3s ease !important;
     }
-    html.apex-war-enabled :is([class*="sparkle"], [aria-label*="Gemini"], [class*="logo"] svg, .bard-logo svg):hover {
-      filter: drop-shadow(0 0 14px #ff2a6d) drop-shadow(0 0 24px #00f0ff) hue-rotate(200deg) saturate(3) !important;
-    }
 
-    /* 3. Input Bar Utility Buttons (+ Attach, Mic, Tools) */
+    /* Input Bar Buttons (+ Attach, Mic, Tools) */
     html.apex-war-enabled div.input-box :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]) :is(mat-icon, svg) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
-      filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.75)) !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
       transition: all 0.2s ease !important;
     }
     html.apex-war-enabled div.input-box :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]):hover :is(mat-icon, svg) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
-      filter: drop-shadow(0 0 9px rgba(255, 42, 109, 0.95)) !important;
-      transform: scale(1.15) !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
+      transform: scale(1.12) !important;
     }
 
-    /* 4. Model Picker Pill: Vintage Arcade Cartridge Badge */
-    html.apex-war-enabled :is([data-test-id*="model"], [class*="model-picker"], [class*="model-select"], button:has([class*="model"]), button[aria-haspopup="menu"]) {
-      background: rgba(0, 240, 255, 0.08) !important;
-      border: 1px solid rgba(0, 240, 255, 0.45) !important;
-      border-radius: 4px !important;
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.25) !important;
-      font-family: 'Share Tech Mono', monospace !important;
-      font-size: 13px !important;
-      color: #00f0ff !important;
-      padding: 3px 9px !important;
-      transition: all 0.2s ease !important;
-    }
-    html.apex-war-enabled :is([data-test-id*="model"], [class*="model-picker"], [class*="model-select"]):hover {
-      border-color: #ff2a6d !important;
-      box-shadow: 0 0 12px rgba(255, 42, 109, 0.45) !important;
-      color: #ff2a6d !important;
-    }
-    html.apex-war-enabled :is([data-test-id*="model"], [class*="model-picker"], [class*="model-select"]) * {
-      color: inherit !important;
-      fill: currentColor !important;
-      font-family: 'Share Tech Mono', monospace !important;
-    }
-
-    /* 5. Send Button: 80s Arcade Fire Button (Replaces generic blue circle) */
+    /* Send Button: Glowing Arcade Action Trigger */
     html.apex-war-enabled :is(.send-button, [aria-label*="Send" i], [data-test-id*="send"], button:has(mat-icon[fonticon="send"])) {
       background: linear-gradient(135deg, #ff2a6d 0%, #aa0055 100%) !important;
       border: 1px solid #ff2a6d !important;
       border-radius: 6px !important;
-      box-shadow: 0 0 14px rgba(255, 42, 109, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.3) !important;
+      box-shadow: 0 0 12px rgba(255, 42, 109, 0.75) !important;
       transition: all 0.2s ease !important;
     }
     html.apex-war-enabled :is(.send-button, [aria-label*="Send" i], [data-test-id*="send"]) :is(mat-icon, svg) {
@@ -324,56 +324,97 @@
       filter: drop-shadow(0 0 4px #ffffff) !important;
     }
     html.apex-war-enabled :is(.send-button:not([disabled]):hover, [aria-label*="Send" i]:not([disabled]):hover) {
-      box-shadow: 0 0 24px #ff2a6d, 0 0 12px #00f0ff !important;
-      transform: scale(1.12) !important;
+      box-shadow: 0 0 20px #ff2a6d, 0 0 10px #00f0ff !important;
+      transform: scale(1.1) !important;
     }
     html.apex-war-enabled :is(.send-button[disabled], [aria-label*="Send" i][disabled]) {
-      opacity: 0.35 !important;
+      opacity: 0.3 !important;
       filter: grayscale(0.8) !important;
       box-shadow: none !important;
+      background: transparent !important;
+      border: none !important;
     }
 
-    /* Chat Messages: Operator vs Mainframe */
-    html.apex-war-enabled :is(.user-query, [class*="user-query"], [data-test-id="user-query"]) {
-      background: rgba(18, 8, 26, 0.88) !important;
-      border: 1px solid #ff2a6d !important;
-      border-radius: 6px !important;
-      box-shadow: 0 0 12px rgba(255, 42, 109, 0.3) !important;
+    /* --- CHAT MESSAGES: TRANSPARENT & CLEAN (NO GIANT SCREEN BORDERS) --- */
+
+    /* Model Response: Completely transparent, NO giant outer bounding box! */
+    html.apex-war-enabled :is(.model-response-text, [class*="model-response-text"], [data-test-id="model-response"], .response-content) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
       font-family: 'Share Tech Mono', monospace !important;
-      color: #ffd6e0 !important;
-      letter-spacing: 0.5px !important;
-      padding: 14px 18px !important;
-    }
-    html.apex-war-enabled :is(.model-response-text, [class*="model-response-text"], [data-test-id="model-response"]) {
-      background: rgba(5, 12, 28, 0.88) !important;
-      border: 1px solid #00f0ff !important;
-      border-radius: 6px !important;
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.25) !important;
-      font-family: 'Share Tech Mono', monospace !important;
-      color: #e0f8ff !important;
-      letter-spacing: 0.5px !important;
-      padding: 14px 18px !important;
+      color: #e4f7ff !important;
+      letter-spacing: 0.4px !important;
       line-height: 1.65 !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 240, 255, 0.3) !important;
     }
 
-    /* Code Blocks: Genuine Matrix Green Phosphor Terminal */
-    html.apex-war-enabled :is(pre, code, .code-block, .code-container, [class*="code-block"]) {
-      font-family: 'VT323', 'Courier New', monospace !important;
-      background: #020509 !important;
+    /* User Query Bubbles: Sleek Translucent Synthwave Glass */
+    html.apex-war-enabled :is(.user-query, [class*="user-query"], [data-test-id="user-query"]) {
+      background: rgba(22, 10, 32, 0.42) !important;
+      backdrop-filter: blur(6px) !important;
+      border: 1px solid rgba(255, 42, 109, 0.55) !important;
+      border-radius: 6px !important;
+      box-shadow: 0 0 10px rgba(255, 42, 109, 0.25) !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #ffe6ef !important;
+      letter-spacing: 0.4px !important;
+      padding: 12px 16px !important;
+    }
+
+    /* --- CODE BLOCKS: TRANSLUCENT GLASS (SINGLE BORDER, DOES NOT BLOCK BACKGROUND) --- */
+
+    /* Target ONLY the outer code block wrapper: Single crisp border, translucent background */
+    html.apex-war-enabled :is(.code-block, [class*="code-block-wrapper"], div:has(> pre > code)) {
+      background: rgba(3, 8, 16, 0.48) !important;
+      backdrop-filter: blur(8px) !important;
       border: 1px solid #39ff14 !important;
-      border-radius: 3px !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 12px rgba(57, 255, 20, 0.18) !important;
+      margin: 12px 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* Reset ALL nested elements inside code blocks (Pre, Code, Headers) to ZERO borders */
+    html.apex-war-enabled :is(.code-block, [class*="code-block-wrapper"], div:has(> pre > code)) :is(pre, code, div, header) {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      background-color: transparent !important;
+    }
+
+    /* Code Block Header (Language tag, copy button) */
+    html.apex-war-enabled :is(.code-block, [class*="code-block-wrapper"]) :is(.header, [class*="header"], [class*="decoration"]) {
+      background: rgba(57, 255, 20, 0.08) !important;
+      border-bottom: 1px solid rgba(57, 255, 20, 0.3) !important;
       color: #39ff14 !important;
-      text-shadow: 0 0 6px rgba(57, 255, 20, 0.55) !important;
-      box-shadow: 0 0 14px rgba(57, 255, 20, 0.18) !important;
+      font-family: 'Share Tech Mono', monospace !important;
+    }
+
+    /* Code typography */
+    html.apex-war-enabled :is(pre code, code) {
+      font-family: 'VT323', 'Courier New', monospace !important;
+      color: #39ff14 !important;
+      text-shadow: 0 0 4px rgba(57, 255, 20, 0.5) !important;
       font-size: 16px !important;
     }
 
-    /* Left Navigation Drawer & Sidebar */
+    /* Inline Code (e.g. yabai in text): NO borders, soft badge */
+    html.apex-war-enabled :not(pre) > code {
+      background: rgba(57, 255, 20, 0.14) !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 3px !important;
+      padding: 1px 5px !important;
+      font-size: 15px !important;
+    }
+
+    /* Left Navigation Drawer & Sidebar: Translucent Cyberdeck */
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, [class*="navigation-drawer"]) {
-      background: rgba(4, 8, 16, 0.94) !important;
+      background: rgba(4, 8, 16, 0.85) !important;
       backdrop-filter: blur(12px) !important;
-      border-right: 1.5px solid rgba(0, 240, 255, 0.45) !important;
-      box-shadow: 2px 0 18px rgba(0, 240, 255, 0.18) !important;
+      border-right: 1.5px solid rgba(0, 240, 255, 0.4) !important;
+      box-shadow: 2px 0 16px rgba(0, 240, 255, 0.15) !important;
       font-family: 'Share Tech Mono', monospace !important;
     }
     html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(a, button, [role="button"]):hover {
@@ -400,11 +441,12 @@
       width: 6px; height: 6px;
     }
     html.apex-war-enabled ::-webkit-scrollbar-track {
-      background: #040711;
+      background: transparent;
     }
     html.apex-war-enabled ::-webkit-scrollbar-thumb {
-      background: #00f0ff;
+      background: #00f0ff88;
       box-shadow: 0 0 6px #00f0ff;
+      border-radius: 3px;
     }
   `);
   document.documentElement.classList.add('apex-war-enabled');
