@@ -16,9 +16,9 @@
   window[KEY]?.destroy?.();
 
   const CFG = Object.freeze({
-    step: 1 / 60, maxSteps: 5, teamLimit: 80,
-    projectiles: 360, debris: 260, effects: 180, wrecks: 50, cell: 120,
-    targetPeriod: .18, baseHP: 1200, roundSeconds: 240, airBudget: 32
+    step: 1 / 60, maxSteps: 3, teamLimit: 48,
+    projectiles: 180, debris: 120, effects: 60, wrecks: 35, cell: 120,
+    targetPeriod: .18, baseHP: 1200, roundSeconds: 240, airBudget: 28
   });
 
   const COLORS = ['#ff2a6d', '#00f0ff'];
@@ -117,9 +117,9 @@
   let quality = 2, autoQuality = true, frameEMA = 16.7, qualityTimer = 0, goodTime = 0;
 
   const limits = () => [
-    { debris: 50, effects: 40, contrails: 60 },
-    { debris: 120, effects: 80, contrails: 140 },
-    { debris: 240, effects: 150, contrails: 240 }
+    { debris: 35, effects: 20, contrails: 35 },
+    { debris: 75, effects: 40, contrails: 80 },
+    { debris: 120, effects: 60, contrails: 140 }
   ][quality];
 
   const spriteCache = new Map();
@@ -136,18 +136,138 @@
   if (!ctx || !bg || !document.body) return;
 
   const style = GM_addStyle(`
-    html.apex-war-enabled { background: #060810 !important; }
-    html.apex-war-enabled body { background: transparent !important; isolation:isolate; }
-    html.apex-war-enabled :is(chat-app,bard-app) { position:relative; z-index:1; }
-    html.apex-war-enabled :is(chat-app,bard-app,main,.page-content,.main-content,.conversation-container) {
-      background-color:transparent !important; background-image:none !important;
-      --gem-sys-color--surface:transparent;
-      --gem-sys-color--background:transparent;
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+    html.apex-war-enabled {
+      background: #04060e !important;
+      font-family: 'Share Tech Mono', 'VT323', monospace !important;
     }
-    html.apex-war-enabled :is(.model-response-text,.user-query) {
-      background:rgba(6,8,16,.76) !important; border-radius:12px;
+    html.apex-war-enabled body {
+      background: transparent !important;
+      isolation: isolate;
+      font-family: 'Share Tech Mono', 'VT323', monospace !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer,.input-area) { background:rgba(6,8,16,.88) !important; }
+    html.apex-war-enabled :is(chat-app, bard-app) {
+      position: relative;
+      z-index: 1;
+    }
+    html.apex-war-enabled :is(chat-app, bard-app, main, .page-content, .main-content, .conversation-container) {
+      background-color: transparent !important;
+      background-image: none !important;
+      --gem-sys-color--surface: transparent;
+      --gem-sys-color--background: transparent;
+    }
+
+    /* 80s CRT Scanline & Phosphor Vignette Overlay */
+    html.apex-war-enabled::after {
+      content: ' ';
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
+                  radial-gradient(circle at 50% 50%, transparent 68%, rgba(0, 0, 0, 0.45) 100%);
+      background-size: 100% 3px, 100% 100%;
+      opacity: 0.55;
+    }
+
+    /* Gemini Hero Greeting: 'Any new ideas to explore?' */
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], h1, .title, .greeting-title, [class*="greeting"]) {
+      font-family: 'VT323', monospace !important;
+      font-size: 2.8rem !important;
+      letter-spacing: 4px !important;
+      color: #00f0ff !important;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 24px rgba(0, 240, 255, 0.4) !important;
+      text-transform: uppercase !important;
+    }
+
+    /* Central Input Bar: 80s Cyberdeck Console */
+    html.apex-war-enabled :is(.input-area, .input-container, .input-box, chat-window-input, [class*="input-area"], [class*="input-box"]) {
+      background: rgba(6, 10, 22, 0.88) !important;
+      backdrop-filter: blur(10px) !important;
+      border: 1.5px solid #00f0ff !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.1) !important;
+      transition: border-color 0.2s, box-shadow 0.2s !important;
+    }
+    html.apex-war-enabled :is(.input-area:focus-within, .input-container:focus-within, [class*="input-area"]:focus-within) {
+      border-color: #ff2a6d !important;
+      box-shadow: 0 0 20px rgba(255, 42, 109, 0.5), inset 0 0 12px rgba(255, 42, 109, 0.15) !important;
+    }
+
+    /* Input text formatting */
+    html.apex-war-enabled :is(.text-input-field, rich-textarea, textarea, div[contenteditable="true"], .ql-editor, [class*="textarea"]) {
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 15px !important;
+      color: #ffffff !important;
+      letter-spacing: 0.8px !important;
+      caret-color: #00f0ff !important;
+    }
+    html.apex-war-enabled :is(.send-button:not([disabled]), [aria-label*="Send"]:not([disabled])) {
+      box-shadow: 0 0 12px #00f0ff !important;
+      color: #00f0ff !important;
+    }
+
+    /* Chat Messages: Operator vs Mainframe */
+    html.apex-war-enabled :is(.user-query, [class*="user-query"], [data-test-id="user-query"]) {
+      background: rgba(14, 8, 20, 0.85) !important;
+      border: 1px solid #ff2a6d !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 10px rgba(255, 42, 109, 0.25) !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #ffd6e0 !important;
+      letter-spacing: 0.5px !important;
+      padding: 12px 16px !important;
+    }
+    html.apex-war-enabled :is(.model-response-text, [class*="model-response-text"], [data-test-id="model-response"]) {
+      background: rgba(6, 12, 26, 0.85) !important;
+      border: 1px solid #00f0ff !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.2) !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #e0f8ff !important;
+      letter-spacing: 0.5px !important;
+      padding: 12px 16px !important;
+      line-height: 1.6 !important;
+    }
+
+    /* Code Blocks: Genuine Matrix Green Phosphor Terminal */
+    html.apex-war-enabled :is(pre, code, .code-block, .code-container, [class*="code-block"]) {
+      font-family: 'VT323', 'Courier New', monospace !important;
+      background: #03050a !important;
+      border: 1px solid #39ff14 !important;
+      border-radius: 2px !important;
+      color: #39ff14 !important;
+      text-shadow: 0 0 4px rgba(57, 255, 20, 0.5) !important;
+      box-shadow: 0 0 12px rgba(57, 255, 20, 0.15) !important;
+      font-size: 15px !important;
+    }
+
+    /* Left Navigation Drawer & Sidebar */
+    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, [class*="navigation-drawer"]) {
+      background: rgba(4, 8, 16, 0.92) !important;
+      backdrop-filter: blur(10px) !important;
+      border-right: 1.5px solid rgba(0, 240, 255, 0.4) !important;
+      box-shadow: 2px 0 15px rgba(0, 240, 255, 0.15) !important;
+      font-family: 'Share Tech Mono', monospace !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(a, button, [role="button"]):hover {
+      color: #00f0ff !important;
+      text-shadow: 0 0 6px #00f0ff !important;
+      background: rgba(0, 240, 255, 0.1) !important;
+    }
+
+    /* Scrollbars: 80s Neon Cyber Sliders */
+    html.apex-war-enabled ::-webkit-scrollbar {
+      width: 6px; height: 6px;
+    }
+    html.apex-war-enabled ::-webkit-scrollbar-track {
+      background: #040711;
+    }
+    html.apex-war-enabled ::-webkit-scrollbar-thumb {
+      background: #00f0ff;
+      box-shadow: 0 0 6px #00f0ff;
+    }
   `);
   document.documentElement.classList.add('apex-war-enabled');
   document.body.prepend(canvas);
@@ -2171,7 +2291,7 @@
       const alpha = clamp(e.life / (e.max || 0.3), 0, 1);
       const r = e.r * (1.3 - alpha * 0.4);
       ctx.save();
-      if (quality > 0) { ctx.shadowBlur = 10; ctx.shadowColor = e.color; }
+      if (quality > 1) { ctx.shadowBlur = 8; ctx.shadowColor = e.color; }
       ctx.strokeStyle = e.color;
       ctx.globalAlpha = alpha * 0.85;
       ctx.lineWidth = 2;
@@ -2436,16 +2556,14 @@
       }
     }
 
-    // Projectiles (Cyberpunk Neon Bloom Tracers, Zero Trajectory Lines)
+    // Projectiles (Cyberpunk Neon Tracers, Zero Trajectory Lines)
     ctx.save();
-    if (quality > 0) ctx.shadowBlur = 8;
     for (const p of shots) {
       if (p.type === 'beam') {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
         ctx.strokeStyle = COLORS[p.team];
-        ctx.shadowColor = COLORS[p.team];
-        ctx.shadowBlur = 18;
+        if (quality > 0) { ctx.shadowColor = COLORS[p.team]; ctx.shadowBlur = 18; }
         ctx.lineWidth = 8;
         ctx.beginPath(); ctx.moveTo(p.x, p.y || 0); ctx.lineTo(p.x, groundAt(p.x)); ctx.stroke();
         ctx.strokeStyle = '#ffffff';
@@ -2455,7 +2573,6 @@
         continue;
       }
       ctx.fillStyle = COLORS[p.team] || '#ffffff';
-      if (quality > 0) ctx.shadowColor = COLORS[p.team] || '#ffffff';
       if (p.type === 'torpedo') {
         ctx.strokeStyle = '#00f0ff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * .04, p.y); ctx.stroke();
       } else if (p.rocket) {
@@ -2533,19 +2650,12 @@
     ctx.textAlign = 'center'; ctx.font = '11px monospace'; ctx.fillStyle = '#8196ad';
     ctx.fillText('RED ' + Math.ceil(bases[0].hp) + '   |   ' + Math.max(0, Math.ceil(CFG.roundSeconds - roundTime)) + 's   |   BLUE ' + Math.ceil(bases[1].hp), W / 2, H - 13);
 
-    // Subtle Cyberpunk CRT Scanline Ambience
-    if (quality > 1) {
-      ctx.fillStyle = 'rgba(0, 240, 255, 0.015)';
-      for (let sy = 0; sy < H; sy += 4) {
-        ctx.fillRect(0, sy, W, 1);
-      }
-    }
   }
 
   function resize() {
     if (stopped) return;
     W = Math.max(160, window.innerWidth); H = Math.max(160, window.innerHeight);
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(1.25, window.devicePixelRatio || 1);
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     backdrop.width = Math.round(W * dpr); backdrop.height = Math.round(H * dpr);
     ctx.resetTransform?.(); ctx.scale(dpr, dpr);
@@ -2568,7 +2678,13 @@
     const elapsed = last === null ? 0 : Math.max(0, (ts - last) / 1000); last = ts;
     if (elapsed > 0) adapt(Math.min(elapsed, .25));
     accumulator += Math.min(elapsed, .25);
-    while (accumulator >= CFG.step) { update(CFG.step); accumulator -= CFG.step; }
+    let steps = 0;
+    while (accumulator >= CFG.step && steps < (CFG.maxSteps || 3)) {
+      update(CFG.step);
+      accumulator -= CFG.step;
+      steps++;
+    }
+    if (accumulator >= CFG.step) accumulator = 0;
     render();
     raf = requestAnimationFrame(frame);
   }
