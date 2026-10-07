@@ -1,9 +1,13 @@
 // ==UserScript==
-// @name         Gemini — Apex ASCII War (Cyberpunk Bloom, Bunker Warfare & Citadel Overhaul)
+// @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      19.0.0
-// @description  Cyberpunk Neon Bloom, Fortified Middle Bunkers, Objective Assault AI, Air Fleet Expansion, Citadel Defense Batteries, Full Tri-Sphere Subterranean Warfare, and Zero Trajectory Lines.
+// @version      20.0.0
+// @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini.
+// @author       rohankosur
+// @license      MIT
 // @match        https://gemini.google.com/*
+// @homepageURL  https://github.com/rohankosur/apex-ascii-war
+// @supportURL   https://github.com/rohankosur/apex-ascii-war/issues
 // @updateURL    https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js
 // @downloadURL  https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js
 // @run-at       document-idle
@@ -104,9 +108,172 @@
   const abort = new AbortController();
   const menus = [];
 
+  const SETTINGS_KEY = 'apex_ascii_war_settings_v20';
+  let settings = {
+    sound: false,
+    volume: 0.35,
+    scanlines: true,
+    speed: 1.0,
+    hudVisible: true,
+    hudOpen: false,
+    quality: 'auto',
+    biome: 'land',
+    redWins: 0,
+    blueWins: 0,
+    totalRounds: 0
+  };
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (raw) settings = Object.assign(settings, JSON.parse(raw));
+  } catch (e) {}
+
+  function saveSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {}
+  }
+
+  // 8-Bit Web Audio Synthesizer Engine
+  class RetroAudioEngine {
+    constructor() {
+      this.ctx = null;
+      this.master = null;
+      this.noiseBuffer = null;
+      this.lastLaser = 0;
+      this.lastBoom = 0;
+      this.activeVoices = 0;
+      this.maxVoices = 4;
+    }
+    init() {
+      if (this.ctx) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        this.ctx = new AudioCtx();
+        this.master = this.ctx.createGain();
+        this.master.gain.setValueAtTime(settings.sound ? settings.volume : 0, this.ctx.currentTime);
+        this.master.connect(this.ctx.destination);
+
+        const sampleRate = this.ctx.sampleRate;
+        this.noiseBuffer = this.ctx.createBuffer(1, sampleRate, sampleRate);
+        const data = this.noiseBuffer.getChannelData(0);
+        for (let i = 0; i < sampleRate; i++) data[i] = Math.random() * 2 - 1;
+      } catch (e) {
+        this.ctx = null;
+      }
+    }
+    resume() {
+      if (!this.ctx) this.init();
+      if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+    }
+    setMute(muted) {
+      if (!this.ctx) this.init();
+      if (this.master && this.ctx) {
+        this.master.gain.setValueAtTime(muted ? 0 : settings.volume, this.ctx.currentTime);
+      }
+    }
+    setVolume(vol) {
+      settings.volume = clamp(vol, 0, 1);
+      if (this.master && this.ctx && settings.sound) {
+        this.master.gain.setValueAtTime(settings.volume, this.ctx.currentTime);
+      }
+    }
+    laser(team = 0) {
+      if (!settings.sound || !this.ctx || this.activeVoices >= this.maxVoices) return;
+      const now = this.ctx.currentTime;
+      if (now - this.lastLaser < 0.05) return;
+      this.lastLaser = now;
+      this.activeVoices++;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = team === 0 ? 'sawtooth' : 'square';
+        osc.frequency.setValueAtTime(team === 0 ? 920 : 760, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.11);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+        osc.connect(gain); gain.connect(this.master);
+        osc.start(now); osc.stop(now + 0.12);
+        osc.onended = () => { this.activeVoices = Math.max(0, this.activeVoices - 1); };
+      } catch (e) { this.activeVoices = Math.max(0, this.activeVoices - 1); }
+    }
+    explosion(scale = 1) {
+      if (!settings.sound || !this.ctx || !this.noiseBuffer || this.activeVoices >= this.maxVoices) return;
+      const now = this.ctx.currentTime;
+      if (now - this.lastBoom < 0.06) return;
+      this.lastBoom = now;
+      this.activeVoices++;
+      try {
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(420 * scale, now);
+        filter.frequency.exponentialRampToValueAtTime(35, now + 0.32 * scale);
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.24 * Math.min(1.2, scale), now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32 * scale);
+        src.connect(filter); filter.connect(gain); gain.connect(this.master);
+        src.start(now); src.stop(now + 0.33 * scale);
+        src.onended = () => { this.activeVoices = Math.max(0, this.activeVoices - 1); };
+      } catch (e) { this.activeVoices = Math.max(0, this.activeVoices - 1); }
+    }
+    flak() {
+      if (!settings.sound || !this.ctx || !this.noiseBuffer || this.activeVoices >= this.maxVoices) return;
+      const now = this.ctx.currentTime;
+      this.activeVoices++;
+      try {
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.noiseBuffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass'; filter.frequency.value = 1100; filter.Q.value = 3;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        src.connect(filter); filter.connect(gain); gain.connect(this.master);
+        src.start(now); src.stop(now + 0.15);
+        src.onended = () => { this.activeVoices = Math.max(0, this.activeVoices - 1); };
+      } catch (e) { this.activeVoices = Math.max(0, this.activeVoices - 1); }
+    }
+    alarm() {
+      if (!settings.sound || !this.ctx || this.activeVoices >= this.maxVoices) return;
+      const now = this.ctx.currentTime;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(480, now);
+        osc.frequency.setValueAtTime(720, now + 0.14);
+        osc.frequency.setValueAtTime(480, now + 0.28);
+        osc.frequency.setValueAtTime(720, now + 0.42);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+        osc.connect(gain); gain.connect(this.master);
+        osc.start(now); osc.stop(now + 0.56);
+      } catch (e) {}
+    }
+    victory(team = 0) {
+      if (!settings.sound || !this.ctx) return;
+      const now = this.ctx.currentTime;
+      const notes = team === 0 ? [261.6, 329.6, 392.0, 523.3, 659.3] : [293.7, 369.9, 440.0, 587.3, 739.9];
+      notes.forEach((freq, i) => {
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          const t = now + i * 0.09;
+          gain.gain.setValueAtTime(0.22, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+          osc.connect(gain); gain.connect(this.master);
+          osc.start(t); osc.stop(t + 0.36);
+        } catch (e) {}
+      });
+    }
+  }
+  const audio = new RetroAudioEngine();
+
   let stopped = false, paused = false, raf = 0, last = null, accumulator = 0;
   let W = 1, H = 1, clock = 0, roundTime = 0, endTimer = 0, winner = null;
-  let biome = 'land';
+  let biome = settings.biome || 'land';
   let doctrines = ['SPEARHEAD', 'TURTLE'], doctrineTimer = 40;
 
   let units = [], shots = [], particles = [], effects = [], wrecks = [], meteors = [];
@@ -116,7 +283,8 @@
   let terrain = [], points = [], bases = [], spawnTimers = [0, 0], airTimers = [1, 1.5], minerTimers = [1.5, 2.5];
   let nextId = 1, terrainDirty = true, terrainCacheTime = 0, meteorTimer = 24, seismicActivity = 0;
   let shake = 0, harvestTimer = 0, ammo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let quality = 2, autoQuality = true, frameEMA = 16.7, qualityTimer = 0, goodTime = 0;
+  let quality = settings.quality === 'auto' ? 2 : clamp(Number(settings.quality) || 2, 0, 2);
+  let autoQuality = settings.quality === 'auto', frameEMA = 16.7, qualityTimer = 0, goodTime = 0;
 
   const limits = () => [
     { debris: 35, effects: 20, contrails: 35 },
@@ -227,8 +395,8 @@
       -webkit-font-smoothing: antialiased !important;
     }
 
-    /* Subtle 80s CRT Scanline & Phosphor Vignette (Transparent, does not darken background) */
-    html.apex-war-enabled::after {
+    /* Subtle 80s CRT Scanline & Phosphor Vignette (Toggleable via Cyberdeck HUD) */
+    html.apex-war-enabled.scanlines-enabled::after {
       content: ' ';
       position: fixed;
       inset: 0;
@@ -608,9 +776,313 @@
       box-shadow: 0 0 6px #00f0ff;
       border-radius: 3px;
     }
+
+    /* ── CYBERDECK RETRO ARCADE HUD CONSOLE & BADGE ── */
+    #apex-cyberdeck-root {
+      position: fixed !important;
+      bottom: 20px !important;
+      right: 22px !important;
+      z-index: 99999 !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      user-select: none !important;
+      pointer-events: auto !important;
+    }
+
+    #apex-hud-pill {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      background: rgba(6, 12, 24, 0.85) !important;
+      backdrop-filter: blur(10px) !important;
+      border: 1.5px solid #00f0ff !important;
+      border-radius: 20px !important;
+      padding: 6px 14px !important;
+      color: #00f0ff !important;
+      font-size: 12px !important;
+      letter-spacing: 1px !important;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.35) !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+    #apex-hud-pill:hover {
+      border-color: #ff2a6d !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 20px rgba(255, 42, 109, 0.6) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    #apex-hud-pill .pulse-dot {
+      width: 7px !important;
+      height: 7px !important;
+      border-radius: 50% !important;
+      background: #39ff14 !important;
+      box-shadow: 0 0 6px #39ff14 !important;
+      animation: pulseGlow 1.5s infinite ease-in-out !important;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.85); }
+    }
+
+    #apex-hud-panel {
+      position: absolute !important;
+      bottom: 46px !important;
+      right: 0 !important;
+      width: 320px !important;
+      background: rgba(4, 8, 18, 0.94) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1.5px solid #00f0ff !important;
+      border-radius: 10px !important;
+      padding: 14px !important;
+      box-shadow: 0 0 24px rgba(0, 240, 255, 0.3), inset 0 0 15px rgba(0, 240, 255, 0.05) !important;
+      color: #e4f7ff !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+      transition: opacity 0.2s ease, transform 0.2s ease !important;
+    }
+    #apex-hud-panel.hidden {
+      display: none !important;
+    }
+
+    .apex-panel-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.25) !important;
+      padding-bottom: 6px !important;
+    }
+    .apex-panel-title {
+      font-size: 12px !important;
+      font-weight: bold !important;
+      color: #00f0ff !important;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6) !important;
+      letter-spacing: 1px !important;
+    }
+    .apex-panel-close {
+      background: transparent !important;
+      border: none !important;
+      color: #ff2a6d !important;
+      cursor: pointer !important;
+      font-size: 15px !important;
+      line-height: 1 !important;
+      padding: 2px 4px !important;
+      transition: transform 0.15s ease !important;
+    }
+    .apex-panel-close:hover {
+      transform: scale(1.25) !important;
+      color: #ffffff !important;
+    }
+
+    .apex-hp-section {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 5px !important;
+      font-size: 11px !important;
+    }
+    .apex-hp-bar-wrap {
+      display: flex !important;
+      height: 7px !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-radius: 4px !important;
+      overflow: hidden !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    .apex-hp-bar-red {
+      background: #ff2a6d !important;
+      box-shadow: 0 0 8px #ff2a6d !important;
+      transition: width 0.3s ease !important;
+    }
+    .apex-hp-bar-blue {
+      background: #00f0ff !important;
+      box-shadow: 0 0 8px #00f0ff !important;
+      transition: width 0.3s ease !important;
+    }
+
+    .apex-stats-row {
+      display: flex !important;
+      justify-content: space-between !important;
+      font-size: 11px !important;
+      color: #ffe600 !important;
+      text-shadow: 0 0 6px rgba(255, 230, 0, 0.4) !important;
+    }
+
+    .apex-grid-controls {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 6px !important;
+    }
+    .apex-btn {
+      background: rgba(0, 240, 255, 0.08) !important;
+      border: 1px solid rgba(0, 240, 255, 0.35) !important;
+      border-radius: 4px !important;
+      color: #e4f7ff !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 11px !important;
+      padding: 5px 6px !important;
+      cursor: pointer !important;
+      text-align: center !important;
+      transition: all 0.15s ease !important;
+    }
+    .apex-btn:hover {
+      background: rgba(0, 240, 255, 0.22) !important;
+      border-color: #00f0ff !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.5) !important;
+    }
+    .apex-btn.active {
+      background: rgba(255, 42, 109, 0.25) !important;
+      border-color: #ff2a6d !important;
+      color: #ffe6ef !important;
+      box-shadow: 0 0 8px rgba(255, 42, 109, 0.5) !important;
+    }
+
+    .apex-footer-info {
+      font-size: 9px !important;
+      color: #64748b !important;
+      text-align: center !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      padding-top: 5px !important;
+    }
   `);
+
   document.documentElement.classList.add('apex-war-enabled');
+  if (settings.scanlines) document.documentElement.classList.add('scanlines-enabled');
   document.body.prepend(canvas);
+
+  // Mount Cyberdeck Retro HUD Widget
+  const hudRoot = document.createElement('div');
+  hudRoot.id = 'apex-cyberdeck-root';
+  if (!settings.hudVisible) hudRoot.style.display = 'none';
+  hudRoot.innerHTML = `
+    <div id="apex-hud-pill" title="Toggle Cyberdeck Console (Alt+Shift+H)">
+      <span class="pulse-dot"></span>
+      <span style="font-weight:bold;color:#00f0ff;">⚡ CYBERDECK</span>
+      <span id="apex-pill-fps" style="color:#ffe600;font-size:10px;">60 FPS</span>
+    </div>
+    <div id="apex-hud-panel" class="${settings.hudOpen ? '' : 'hidden'}">
+      <div class="apex-panel-header">
+        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.0</span>
+        <button class="apex-panel-close" id="apex-hud-close" title="Minimize Console">✕</button>
+      </div>
+      <div class="apex-hp-section">
+        <div style="display:flex;justify-content:space-between;color:#ff2a6d;">
+          <span>RED CITADEL</span>
+          <span id="apex-hp-red-val">1200 / 1200</span>
+        </div>
+        <div class="apex-hp-bar-wrap">
+          <div id="apex-hp-red-bar" class="apex-hp-bar-red" style="width:100%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;color:#00f0ff;margin-top:3px;">
+          <span>BLUE CITADEL</span>
+          <span id="apex-hp-blue-val">1200 / 1200</span>
+        </div>
+        <div class="apex-hp-bar-wrap">
+          <div id="apex-hp-blue-bar" class="apex-hp-bar-blue" style="width:100%;"></div>
+        </div>
+      </div>
+      <div class="apex-stats-row">
+        <span>MATCH RECORD:</span>
+        <span id="apex-score-record" style="font-weight:bold;">RED ${settings.redWins} ─ BLUE ${settings.blueWins}</span>
+      </div>
+      <div class="apex-grid-controls">
+        <button class="apex-btn" id="apex-btn-pause">${paused ? '▶ RESUME' : '⏸ PAUSE'}</button>
+        <button class="apex-btn" id="apex-btn-reset">🔄 RESTART</button>
+        <button class="apex-btn" id="apex-btn-speed">⏩ SPEED: ${settings.speed}X</button>
+        <button class="apex-btn" id="apex-btn-quality">⚙ Q: ${autoQuality ? 'AUTO' : quality === 2 ? 'ULTRA' : quality === 1 ? 'MED' : 'LOW'}</button>
+        <button class="apex-btn ${settings.scanlines ? 'active' : ''}" id="apex-btn-scanlines">📺 CRT: ${settings.scanlines ? 'ON' : 'OFF'}</button>
+        <button class="apex-btn ${settings.sound ? 'active' : ''}" id="apex-btn-sound">🔊 SFX: ${settings.sound ? 'ON' : 'OFF'}</button>
+        <button class="apex-btn" id="apex-btn-biome">🌐 ${biome === 'land' ? 'LAND SIEGE' : 'NAVAL WAR'}</button>
+        <button class="apex-btn" id="apex-btn-reset-score" style="color:#f87171;">🏆 RESET RECORD</button>
+      </div>
+      <div class="apex-stats-row" style="color:#94a3b8;font-size:10px;">
+        <span id="apex-diag-units">UNITS: 0</span>
+        <span id="apex-diag-frame">16.7ms</span>
+        <span id="apex-diag-round">ROUND: 0s</span>
+      </div>
+      <div class="apex-footer-info">
+        SHORTCUTS: Alt+Shift+W (Pause) | Alt+Shift+M (Sound) | Alt+Shift+H (HUD)
+      </div>
+    </div>
+  `;
+  document.body.appendChild(hudRoot);
+
+  // Wire HUD Console Event Listeners
+  const hudPill = hudRoot.querySelector('#apex-hud-pill');
+  const hudPanel = hudRoot.querySelector('#apex-hud-panel');
+  const hudClose = hudRoot.querySelector('#apex-hud-close');
+  const btnPause = hudRoot.querySelector('#apex-btn-pause');
+  const btnReset = hudRoot.querySelector('#apex-btn-reset');
+  const btnSpeed = hudRoot.querySelector('#apex-btn-speed');
+  const btnQuality = hudRoot.querySelector('#apex-btn-quality');
+  const btnScanlines = hudRoot.querySelector('#apex-btn-scanlines');
+  const btnSound = hudRoot.querySelector('#apex-btn-sound');
+  const btnBiome = hudRoot.querySelector('#apex-btn-biome');
+  const btnResetScore = hudRoot.querySelector('#apex-btn-reset-score');
+
+  hudPill?.addEventListener('click', () => {
+    audio.resume();
+    settings.hudOpen = !settings.hudOpen;
+    hudPanel?.classList.toggle('hidden', !settings.hudOpen);
+    saveSettings();
+  });
+  hudClose?.addEventListener('click', () => {
+    settings.hudOpen = false;
+    hudPanel?.classList.add('hidden');
+    saveSettings();
+  });
+  btnPause?.addEventListener('click', () => {
+    audio.resume();
+    api.pause();
+    btnPause.textContent = paused ? '▶ RESUME' : '⏸ PAUSE';
+  });
+  btnReset?.addEventListener('click', () => {
+    audio.resume();
+    api.reset();
+  });
+  btnSpeed?.addEventListener('click', () => {
+    const speeds = [1.0, 2.0, 0.5];
+    const nextIdx = (speeds.indexOf(settings.speed) + 1) % speeds.length;
+    settings.speed = speeds[nextIdx];
+    btnSpeed.textContent = `⏩ SPEED: ${settings.speed}X`;
+    saveSettings();
+  });
+  btnQuality?.addEventListener('click', () => {
+    if (autoQuality) { api.setQuality(0); }
+    else if (quality === 0) { api.setQuality(1); }
+    else if (quality === 1) { api.setQuality(2); }
+    else { api.setQuality('auto'); }
+    btnQuality.textContent = `⚙ Q: ${autoQuality ? 'AUTO' : quality === 2 ? 'ULTRA' : quality === 1 ? 'MED' : 'LOW'}`;
+  });
+  btnScanlines?.addEventListener('click', () => {
+    settings.scanlines = !settings.scanlines;
+    document.documentElement.classList.toggle('scanlines-enabled', settings.scanlines);
+    btnScanlines.textContent = `📺 CRT: ${settings.scanlines ? 'ON' : 'OFF'}`;
+    btnScanlines.classList.toggle('active', settings.scanlines);
+    saveSettings();
+  });
+  btnSound?.addEventListener('click', () => {
+    audio.resume();
+    settings.sound = !settings.sound;
+    audio.setMute(!settings.sound);
+    if (settings.sound) audio.victory(0);
+    btnSound.textContent = `🔊 SFX: ${settings.sound ? 'ON' : 'OFF'}`;
+    btnSound.classList.toggle('active', settings.sound);
+    saveSettings();
+  });
+  btnBiome?.addEventListener('click', () => {
+    audio.resume();
+    settings.biome = biome = (biome === 'land' ? 'naval' : 'land');
+    btnBiome.textContent = `🌐 ${biome === 'land' ? 'LAND SIEGE' : 'NAVAL WAR'}`;
+    saveSettings();
+    api.reset();
+  });
+  btnResetScore?.addEventListener('click', () => {
+    settings.redWins = settings.blueWins = settings.totalRounds = 0;
+    saveSettings();
+    const rec = hudRoot.querySelector('#apex-score-record');
+    if (rec) rec.textContent = 'RED 0 ─ BLUE 0';
+  });
 
   function say(x, y, text, color = '#fff', life = 1.3) {
     if (chatter.length > 32) chatter.shift();
@@ -622,31 +1094,85 @@
       if (stopped) return;
       stopped = true; abort.abort(); cancelAnimationFrame(raf);
       for (const id of menus) if (typeof GM_unregisterMenuCommand === 'function') GM_unregisterMenuCommand(id);
-      canvas.remove(); style?.remove?.(); document.documentElement.classList.remove('apex-war-enabled');
+      canvas.remove(); style?.remove?.(); hudRoot?.remove?.();
+      document.documentElement.classList.remove('apex-war-enabled', 'scanlines-enabled');
       spriteCache.clear(); grid.clear(); crashHazards.length = 0;
       units.length = shots.length = particles.length = effects.length = wrecks.length = meteors.length = 0;
       chatter.length = landmines.length = casTargets.length = contrails.length = flakClouds.length = 0;
       dropPods.length = paratroopers.length = trenches.length = tunnels.length = islands.length = 0; supplyDrop = null;
       if (window[KEY] === api) delete window[KEY];
     },
-    pause(value = !paused) { paused = !!value; last = null; accumulator = 0; schedule(); return paused; },
+    pause(value = !paused) {
+      paused = !!value; last = null; accumulator = 0; schedule();
+      if (btnPause) btnPause.textContent = paused ? '▶ RESUME' : '⏸ PAUSE';
+      return paused;
+    },
     reset() { if (!stopped) { resetRound(); rebuildGrid(); terrainCacheTime = 0; if (paused) render(); } },
     setQuality(value = 'auto') {
       autoQuality = value === 'auto';
+      settings.quality = value;
       if (!autoQuality) quality = clamp(Math.round(Number(value) || 0), 0, 2);
       qualityTimer = goodTime = 0;
+      if (btnQuality) btnQuality.textContent = `⚙ Q: ${autoQuality ? 'AUTO' : quality === 2 ? 'ULTRA' : quality === 1 ? 'MED' : 'LOW'}`;
+      saveSettings();
     },
+    toggleSound(value = !settings.sound) {
+      settings.sound = !!value; audio.setMute(!settings.sound);
+      if (btnSound) {
+        btnSound.textContent = `🔊 SFX: ${settings.sound ? 'ON' : 'OFF'}`;
+        btnSound.classList.toggle('active', settings.sound);
+      }
+      saveSettings();
+      return settings.sound;
+    },
+    setVolume(vol) { audio.setVolume(vol); saveSettings(); },
+    setSpeed(spd) {
+      settings.speed = clamp(spd, 0.25, 4.0);
+      if (btnSpeed) btnSpeed.textContent = `⏩ SPEED: ${settings.speed}X`;
+      saveSettings();
+    },
+    setBiome(b) {
+      if (b === 'land' || b === 'naval') {
+        settings.biome = biome = b;
+        if (btnBiome) btnBiome.textContent = `🌐 ${biome === 'land' ? 'LAND SIEGE' : 'NAVAL WAR'}`;
+        saveSettings();
+        api.reset();
+      }
+      return biome;
+    },
+    toggleScanlines(value = !settings.scanlines) {
+      settings.scanlines = !!value;
+      document.documentElement.classList.toggle('scanlines-enabled', settings.scanlines);
+      if (btnScanlines) {
+        btnScanlines.textContent = `📺 CRT: ${settings.scanlines ? 'ON' : 'OFF'}`;
+        btnScanlines.classList.toggle('active', settings.scanlines);
+      }
+      saveSettings();
+    },
+    toggleHUD(force) {
+      settings.hudVisible = force !== undefined ? !!force : !settings.hudVisible;
+      hudRoot.style.display = settings.hudVisible ? 'block' : 'none';
+      saveSettings();
+    },
+    resetScores() {
+      settings.redWins = settings.blueWins = settings.totalRounds = 0;
+      saveSettings();
+      const rec = hudRoot.querySelector('#apex-score-record');
+      if (rec) rec.textContent = 'RED 0 ─ BLUE 0';
+    },
+    getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '19.0.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.0.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
-        frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1)
+        frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
+        scores: { red: settings.redWins, blue: settings.blueWins, rounds: settings.totalRounds }
       };
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v19.0.0 ACTIVE - Consistent Fonts, Single Cyan Bubble & Fixed Code Icons Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.0.0 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
@@ -722,16 +1248,24 @@
     grid.clear(); crashHazards.length = 0; roundTime = 0; winner = null; endTimer = 0; shake = 0;
     spawnTimers = [0, 0]; airTimers = [1, 1.5]; minerTimers = [1.5, 2.5]; meteorTimer = rand(22, 34);
 
-    // Continental tri-sphere siege with full Stratosphere, Surface, and Subterranean layers
-    biome = 'land';
+    biome = settings.biome || 'land';
     doctrines = [Math.random() < .5 ? 'SPEARHEAD' : 'TURTLE', Math.random() < .5 ? 'SPEARHEAD' : 'TURTLE'];
 
     const castleOffset = clamp(W * 0.065, 80, 110);
     terrain = Array.from({ length: 81 }, (_, i) => H * (.75 + .035 * Math.sin(i * .21) + .028 * Math.cos(i * .43)));
     points = [.28, .5, .72].map((f, i) => ({ x: W * f, progress: 0, owner: -1, label: String(i + 1) }));
 
-    tunnels.push({ x: 30, y: H * .88, team: 0, life: 999 });
-    tunnels.push({ x: W - 30, y: H * .88, team: 1, life: 999 });
+    if (biome === 'naval') {
+      islands = [
+        { x: W * .22, r: 90, h: 28 },
+        { x: W * .5,  r: 120, h: 36 },
+        { x: W * .78, r: 90, h: 28 }
+      ];
+    } else {
+      islands = [];
+      tunnels.push({ x: 30, y: H * .88, team: 0, life: 999 });
+      tunnels.push({ x: W - 30, y: H * .88, team: 1, life: 999 });
+    }
 
     bases = [0, 1].map(team => {
       const bx = team ? W - castleOffset : castleOffset;
@@ -743,6 +1277,7 @@
       };
     });
     terrainDirty = true;
+    terrainCacheTime = 0;
   }
 
   function rebuildGrid() {
@@ -855,12 +1390,14 @@
     u.hp = Math.max(0, u.hp - amount); u.flash = .09;
 
     if (!u.hp) {
+      audio.explosion(['titan', 'dread', 'battleship'].includes(u.kind) ? 1.6 : 0.85);
       if (attacker && attacker.hp > 0) {
         attacker.kills = (attacker.kills || 0) + 1;
         const heavyKill = ['titan', 'dread', 'battleship'].includes(u.kind);
         if (!attacker.hero && (attacker.kills >= 5 || heavyKill)) {
           attacker.hero = true; attacker.heroTime = 14;
           attacker.hp = Math.min(attacker.maxHP, attacker.hp + attacker.maxHP * .4);
+          audio.victory(attacker.team);
           say(attacker.x, attacker.y - 28, heavyKill ? '★ SLAYER HERO!' : '★★★ ACE HERO!', '#ffe066', 2.0);
         }
       }
@@ -1186,6 +1723,7 @@
 
   function fire(u, x, y) {
     if (shots.length >= CFG.projectiles) return;
+    audio.laser(u.team);
     const distance = Math.hypot(x - u.x, y - u.y);
     const heroBonus = u.hero ? .7 : 1;
     const error = (u.accuracy || 1) * (u.moving ? 1.2 : 1) * (u.panicTime > 0 ? 1.8 : 1) * heroBonus;
@@ -1983,8 +2521,30 @@
       if (p.owner >= 0) bases[1 - p.owner].hp = Math.max(0, bases[1 - p.owner].hp - dt * .45);
     }
     if (bases.some(b => b.hp <= 0) || roundTime >= CFG.roundSeconds) {
-      winner = Math.abs(bases[0].hp - bases[1].hp) < .01 ? -1 : bases[0].hp > bases[1].hp ? 0 : 1;
-      endTimer = 6;
+      if (winner === null) {
+        winner = Math.abs(bases[0].hp - bases[1].hp) < .01 ? -1 : bases[0].hp > bases[1].hp ? 0 : 1;
+        endTimer = 6;
+        settings.totalRounds = (settings.totalRounds || 0) + 1;
+        if (winner >= 0) {
+          if (winner === 0) settings.redWins = (settings.redWins || 0) + 1;
+          else if (winner === 1) settings.blueWins = (settings.blueWins || 0) + 1;
+          audio.victory(winner);
+        }
+        saveSettings();
+        const scoreRec = hudRoot?.querySelector?.('#apex-score-record');
+        if (scoreRec) scoreRec.textContent = `RED ${settings.redWins} ─ BLUE ${settings.blueWins}`;
+        const deadBase = bases.find(b => b.hp <= 0) || (winner >= 0 ? bases[1 - winner] : bases[0]);
+        if (deadBase) {
+          for (let f = 0; f < 35; f++) {
+            particles.push({
+              x: deadBase.x + rand(-60, 60), y: deadBase.y - rand(20, 110),
+              vx: rand(-100, 100), vy: rand(-150, -40),
+              life: rand(1.8, 3.6), color: Math.random() < 0.5 ? '#ff2a6d' : '#00f0ff',
+              bounced: true
+            });
+          }
+        }
+      }
     }
   }
 
@@ -2217,8 +2777,13 @@
 
   function update(dt) {
     clock += dt; shake = Math.max(0, shake - dt); terrainCacheTime -= dt; seismicActivity = Math.max(0, seismicActivity - dt * 1.2);
-    if (endTimer > 0) { endTimer -= dt; if (endTimer <= 0) resetRound(); return; }
-    roundTime += dt;
+    if (endTimer > 0) {
+      endTimer -= dt;
+      dt *= 0.35;
+      if (endTimer <= 0) { resetRound(); return; }
+    } else {
+      roundTime += dt;
+    }
 
     doctrineTimer -= dt;
     if (doctrineTimer <= 0) {
@@ -3058,15 +3623,36 @@
 
   }
 
+  let oldW = 0, oldH = 0;
   function resize() {
     if (stopped) return;
-    W = Math.max(160, window.innerWidth); H = Math.max(160, window.innerHeight);
-    const dpr = Math.min(1.25, window.devicePixelRatio || 1);
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-    backdrop.width = Math.round(W * dpr); backdrop.height = Math.round(H * dpr);
+    const newW = Math.max(160, window.innerWidth);
+    const newH = Math.max(160, window.innerHeight);
+    const dpr = Math.min(quality === 0 ? 1 : 1.25, window.devicePixelRatio || 1);
+    canvas.width = Math.round(newW * dpr); canvas.height = Math.round(newH * dpr);
+    backdrop.width = Math.round(newW * dpr); backdrop.height = Math.round(newH * dpr);
     ctx.resetTransform?.(); ctx.scale(dpr, dpr);
     bg.resetTransform?.(); bg.scale(dpr, dpr);
-    resetRound();
+
+    if (oldW === 0 || units.length === 0 || terrain.length === 0) {
+      W = newW; H = newH;
+      resetRound();
+    } else {
+      const scaleX = newW / oldW;
+      const scaleY = newH / oldH;
+      W = newW; H = newH;
+      for (const u of units) { u.x *= scaleX; u.y *= scaleY; }
+      for (const s of shots) { s.x *= scaleX; s.y *= scaleY; }
+      for (const p of points) { p.x *= scaleX; }
+      const castleOffset = clamp(W * 0.065, 80, 110);
+      if (bases[0]) { bases[0].x = castleOffset; bases[0].y = groundAt(castleOffset); }
+      if (bases[1]) { bases[1].x = W - castleOffset; bases[1].y = groundAt(W - castleOffset); }
+      terrain = Array.from({ length: 81 }, (_, i) => H * (.75 + .035 * Math.sin(i * .21) + .028 * Math.cos(i * .43)));
+      terrainDirty = true;
+      terrainCacheTime = 0;
+      rebuildGrid();
+    }
+    oldW = newW; oldH = newH;
   }
 
   function adapt(elapsed) {
@@ -3078,12 +3664,13 @@
     else if (goodTime > 15 && quality < 2) { quality++; qualityTimer = 0; goodTime = 0; }
   }
 
+  let hudTick = 0;
   function frame(ts) {
     raf = 0; if (stopped || document.hidden) return;
     if (paused) { render(); last = null; return; }
     const elapsed = last === null ? 0 : Math.max(0, (ts - last) / 1000); last = ts;
     if (elapsed > 0) adapt(Math.min(elapsed, .25));
-    accumulator += Math.min(elapsed, .25);
+    accumulator += Math.min(elapsed, .25) * (settings.speed || 1);
     let steps = 0;
     while (accumulator >= CFG.step && steps < (CFG.maxSteps || 3)) {
       update(CFG.step);
@@ -3092,6 +3679,31 @@
     }
     if (accumulator >= CFG.step) accumulator = 0;
     render();
+
+    // Smooth HUD updates every ~8 frames
+    hudTick++;
+    if (hudTick % 8 === 0 && hudRoot) {
+      const fps = Math.round(1000 / Math.max(1, frameEMA));
+      const pillFps = hudRoot.querySelector('#apex-pill-fps');
+      if (pillFps) pillFps.textContent = `${fps} FPS`;
+      if (settings.hudOpen) {
+        const hpRedVal = hudRoot.querySelector('#apex-hp-red-val');
+        const hpRedBar = hudRoot.querySelector('#apex-hp-red-bar');
+        const hpBlueVal = hudRoot.querySelector('#apex-hp-blue-val');
+        const hpBlueBar = hudRoot.querySelector('#apex-hp-blue-bar');
+        const diagUnits = hudRoot.querySelector('#apex-diag-units');
+        const diagFrame = hudRoot.querySelector('#apex-diag-frame');
+        const diagRound = hudRoot.querySelector('#apex-diag-round');
+        if (hpRedVal && bases[0]) hpRedVal.textContent = `${Math.ceil(bases[0].hp)} / ${CFG.baseHP}`;
+        if (hpRedBar && bases[0]) hpRedBar.style.width = `${Math.max(0, Math.min(100, bases[0].hp / CFG.baseHP * 100))}%`;
+        if (hpBlueVal && bases[1]) hpBlueVal.textContent = `${Math.ceil(bases[1].hp)} / ${CFG.baseHP}`;
+        if (hpBlueBar && bases[1]) hpBlueBar.style.width = `${Math.max(0, Math.min(100, bases[1].hp / CFG.baseHP * 100))}%`;
+        if (diagUnits) diagUnits.textContent = `UNITS: ${units.length}`;
+        if (diagFrame) diagFrame.textContent = `${frameEMA.toFixed(1)}ms`;
+        if (diagRound) diagRound.textContent = `ROUND: ${Math.ceil(roundTime)}s`;
+      }
+    }
+
     raf = requestAnimationFrame(frame);
   }
 
@@ -3106,14 +3718,19 @@
     if (!e.altKey || !e.shiftKey || e.repeat) return;
     if (e.code === 'KeyW') { e.preventDefault(); api.pause(); }
     if (e.code === 'KeyQ') { e.preventDefault(); api.setQuality(autoQuality ? 0 : quality < 2 ? quality + 1 : 'auto'); }
+    if (e.code === 'KeyM') { e.preventDefault(); api.toggleSound(); }
+    if (e.code === 'KeyH') { e.preventDefault(); api.toggleHUD(); }
+    if (e.code === 'KeyR') { e.preventDefault(); api.reset(); }
   }, { signal: abort.signal });
 
   if (typeof GM_registerMenuCommand === 'function') {
-    menus.push(GM_registerMenuCommand('Siege: pause / resume (Alt+Shift+W)', () => api.pause()));
-    menus.push(GM_registerMenuCommand('Siege: restart battle', () => api.reset()));
-    menus.push(GM_registerMenuCommand('Siege: automatic dynamic quality', () => api.setQuality('auto')));
-    menus.push(GM_registerMenuCommand('Siege: high quality (cyberpunk bloom)', () => api.setQuality(2)));
-    menus.push(GM_registerMenuCommand('Siege: low quality (high performance)', () => api.setQuality(0)));
+    menus.push(GM_registerMenuCommand('Cyberdeck: pause / resume (Alt+Shift+W)', () => api.pause()));
+    menus.push(GM_registerMenuCommand('Cyberdeck: restart battle (Alt+Shift+R)', () => api.reset()));
+    menus.push(GM_registerMenuCommand('Cyberdeck: toggle sound SFX (Alt+Shift+M)', () => api.toggleSound()));
+    menus.push(GM_registerMenuCommand('Cyberdeck: toggle HUD console (Alt+Shift+H)', () => api.toggleHUD()));
+    menus.push(GM_registerMenuCommand('Cyberdeck: automatic quality (60 FPS)', () => api.setQuality('auto')));
+    menus.push(GM_registerMenuCommand('Cyberdeck: ultra quality (bloom)', () => api.setQuality(2)));
+    menus.push(GM_registerMenuCommand('Cyberdeck: low quality (high performance)', () => api.setQuality(0)));
   }
 
   resize(); schedule();
