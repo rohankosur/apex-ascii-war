@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      20.3.1
+// @version      20.3.2
 // @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini.
 // @author       rohankosur
 // @license      MIT
@@ -306,7 +306,7 @@
   if (!ctx || !bg || !document.body) return;
 
   const style = GM_addStyle(`
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
     /* --- 1. CONSISTENT MONOSPACE TYPOGRAPHY ACROSS ENTIRE INTERFACE --- */
     :root, html.apex-war-enabled {
@@ -371,7 +371,7 @@
       .model-response-text, .response-content, .markdown, message-content,
       .text-input-field, rich-textarea, .ql-editor
     ),
-    html.apex-war-enabled :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, .markdown, .model-response-text) :is(span:not([class*="symbol"]):not([class*="icon"]):not([class*="mat-"]):not([class*="google"]), a, strong, em, b, i:not([class*="material"]):not([class*="icon"])) {
+    html.apex-war-enabled :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, .markdown, .model-response-text) :is(span:not([class*="symbol"]):not([class*="icon"]):not([class*="mat-"]):not([class*="google"]):not(button *):not([role="button"] *), a, strong, em, b, i:not([class*="material"]):not([class*="icon"])) {
       font-family: 'Share Tech Mono', monospace !important;
       letter-spacing: 0.35px !important;
     }
@@ -719,10 +719,11 @@
 
     /* --- 6. CODE BLOCKS: ULTRA-CLEAN TRANSLUCENT GLASS (ZERO NESTED BORDERS) --- */
 
-    /* Target ONLY outer code block container: single subtle green frame, 35% translucent fill */
+    /* Target ONLY outer code block container: single subtle green frame, unblurred translucent fill */
     html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) {
-      background: rgba(2, 6, 14, 0.38) !important;
-      backdrop-filter: blur(8px) !important;
+      background: rgba(2, 6, 14, 0.48) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       border: 1px solid rgba(57, 255, 20, 0.55) !important;
       border-radius: 4px !important;
       box-shadow: 0 0 10px rgba(57, 255, 20, 0.12) !important;
@@ -748,6 +749,7 @@
       align-items: center !important;
       justify-content: space-between !important;
       padding: 6px 12px !important;
+      font-family: 'Share Tech Mono', monospace !important;
     }
 
     /* Target the Copy Code and Download Code action buttons */
@@ -763,20 +765,34 @@
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
+      overflow: visible !important;
       transition: all 0.2s ease !important;
     }
 
-    /* Target Material Symbols inside code block action buttons */
-    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]) :is(mat-icon, [class*="mat-icon"], .google-symbols, [class*="google-symbols"], [fonticon], [data-mat-icon-type], span[class*="icon"], span[class*="symbol"]) {
-      font-family: 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons' !important;
+    /* Target Material Symbols inside code block action buttons (never clip ligatures) */
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"], [class*="action"], [class*="copy"], [class*="download"]) :is(
+      mat-icon, [class*="mat-icon"],
+      .google-symbols, [class*="google-symbols"],
+      .material-symbols-outlined, [class*="material-symbols"],
+      [fonticon], [data-mat-icon-type],
+      span, i
+    ) {
+      font-family: 'Material Symbols Outlined', 'Google Symbols', 'Material Symbols Rounded', 'Material Icons' !important;
       font-style: normal !important;
       font-weight: normal !important;
       font-feature-settings: 'liga' 1 !important;
       -webkit-font-feature-settings: 'liga' 1 !important;
+      font-variant-ligatures: normal !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+      white-space: nowrap !important;
+      word-wrap: normal !important;
+      direction: ltr !important;
+      line-height: 1 !important;
       color: #39ff14 !important;
       font-size: 18px !important;
-      line-height: 18px !important;
-      width: 18px !important;
+      width: auto !important;
+      min-width: 18px !important;
       height: 18px !important;
       display: inline-flex !important;
       align-items: center !important;
@@ -798,7 +814,12 @@
     }
 
     /* Hover effect for copy and download buttons */
-    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]):hover :is(mat-icon, [class*="mat-icon"], .google-symbols, [fonticon], span[class*="icon"], span[class*="symbol"]) {
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]):hover :is(
+      mat-icon, [class*="mat-icon"],
+      .google-symbols, [class*="google-symbols"],
+      .material-symbols-outlined, [fonticon],
+      span, i
+    ) {
       color: #00f0ff !important;
       filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9)) !important;
       transform: scale(1.15) !important;
@@ -937,6 +958,13 @@
       filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)) !important;
     }
 
+    /* Enforce Share Tech Mono across sidebar text and labels */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+      [class*="title"], [class*="logo"], [class*="text"], [class*="label"], span, a, button, p
+    ):not(:is(mat-icon, [class*="mat-icon"], .google-symbols, [class*="google-symbols"], [fonticon], [data-mat-icon-type], i, svg, svg *)) {
+      font-family: 'Share Tech Mono', monospace !important;
+    }
+
     /* Header Hamburger Menu Button */
     html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]) {
       background: transparent !important;
@@ -957,43 +985,101 @@
       transform: scale(1.15) !important;
     }
 
-    /* Segmented Mode Switcher: Arcade Dual-Channel Rocker (Chat | Spark) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="tablist"], [class*="mode-switcher"], [class*="tab-group"], [class*="segmented-button"]) {
-      background: rgba(10, 16, 32, 0.75) !important;
-      border: 1px solid rgba(0, 240, 255, 0.3) !important;
-      border-radius: 20px !important;
-      padding: 3px !important;
-      margin: 8px 12px 12px 12px !important;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.15) !important;
+    /* Segmented Mode Switcher: Clean, Borderless & Minimalist (Chat | Spark) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+      [role="tablist"],
+      [class*="mode-switcher"],
+      [class*="tab-group"],
+      [class*="segmented-button"],
+      [class*="header-top"],
+      [class*="switcher"]
+    ) {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      padding: 2px !important;
+      margin: 4px 8px !important;
     }
+
+    /* Individual Mode Switcher Buttons / Tabs */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+      [role="tab"],
+      [class*="segmented-button"] button,
+      [class*="mode-switcher"] button,
+      [class*="tab-button"],
+      [class*="mode-button"]
+    ) {
+      font-family: 'Share Tech Mono', monospace !important;
+      letter-spacing: 0.6px !important;
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      color: #7d9cb8 !important;
+      padding: 4px 8px !important;
+      border-radius: 4px !important;
+      transition: all 0.2s ease !important;
+    }
+
     /* Active Channel Tab (Chat) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="tab"][aria-selected="true"], [class*="segmented-button"] [class*="selected"]) {
-      background: rgba(0, 240, 255, 0.18) !important;
-      border: 1px solid #00f0ff !important;
-      border-radius: 16px !important;
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+      [role="tab"][aria-selected="true"],
+      [role="tab"].selected,
+      [class*="segmented-button"] button[class*="selected"],
+      [class*="segmented-button"] button[aria-selected="true"],
+      [class*="mode-switcher"] button[class*="selected"]
+    ) {
+      background: rgba(0, 240, 255, 0.14) !important;
+      border: none !important;
+      outline: none !important;
+      border-left: 2.5px solid #00f0ff !important;
+      border-radius: 3px !important;
       color: #00f0ff !important;
       text-shadow: 0 0 8px rgba(0, 240, 255, 0.7) !important;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
+      box-shadow: none !important;
       font-weight: bold !important;
     }
-    /* Inactive Channel Tab */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="tab"][aria-selected="false"], [class*="segmented-button"] button:not([class*="selected"])) {
-      color: #7d9cb8 !important;
-      background: transparent !important;
+
+    /* Ensure parent buttons, tabs and wrappers around BETA badges NEVER produce an outer border */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(button, [role="tab"], a, div):has(:is([class*="badge"], [class*="beta"])) {
       border: none !important;
+      outline: none !important;
       box-shadow: none !important;
+      background: transparent !important;
+      background-color: transparent !important;
     }
-    /* Spark "BETA" Microchip Badge */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([class*="badge"], [class*="beta"]) {
-      background: rgba(255, 42, 109, 0.2) !important;
+
+    /* Spark "BETA" Microchip Badge: Single Clean Crisp Pill */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+      span[class*="badge"],
+      span[class*="beta"],
+      [class*="beta-badge"],
+      [class*="spark-badge"]
+    ) {
+      background: rgba(255, 42, 109, 0.18) !important;
       color: #ff2a6d !important;
-      border: 1px solid rgba(255, 42, 109, 0.5) !important;
+      border: 1px solid rgba(255, 42, 109, 0.65) !important;
       border-radius: 4px !important;
+      font-family: 'Share Tech Mono', monospace !important;
       font-size: 9px !important;
       font-weight: bold !important;
       letter-spacing: 0.8px !important;
-      padding: 1px 4px !important;
+      padding: 1px 5px !important;
+      box-shadow: 0 0 6px rgba(255, 42, 109, 0.3) !important;
+      display: inline-block !important;
+      line-height: normal !important;
+      vertical-align: middle !important;
+    }
+
+    /* Strip any inner borders inside the BETA badge */
+    html.apex-war-enabled :is(span[class*="badge"], span[class*="beta"], [class*="beta-badge"]) :is(*, span, div) {
+      border: none !important;
+      outline: none !important;
       box-shadow: none !important;
+      background: transparent !important;
     }
 
     /* "New Chat" Action Button */
@@ -1610,7 +1696,7 @@
     </div>
     <div id="apex-hud-panel" class="${settings.hudOpen ? '' : 'hidden'}">
       <div class="apex-panel-header">
-        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.3.1</span>
+        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.3.2</span>
         <button class="apex-panel-close" id="apex-hud-close" title="Minimize Console">✕</button>
       </div>
       <div class="apex-hp-section">
@@ -1811,7 +1897,7 @@
     getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '20.3.1', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.3.2', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
@@ -1820,7 +1906,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v20.3.1 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.3.2 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
