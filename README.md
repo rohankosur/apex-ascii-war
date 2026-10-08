@@ -1,6 +1,6 @@
-# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.2
+# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.3
 
-[![Version](https://img.shields.io/badge/version-20.2.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
+[![Version](https://img.shields.io/badge/version-20.3.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ff2a6d.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Gemini-ffe600.svg?style=flat-square)](https://gemini.google.com/)
 [![Audio](https://img.shields.io/badge/audio-8--Bit%20Web%20Audio%20Synth-39ff14.svg?style=flat-square)](#-8-bit-web-audio-synthesizer)
@@ -10,20 +10,19 @@
 
 ---
 
-## 🎮 Highlights & New in v20.2.0
+## 🎮 Highlights & New in v20.3.0
 
-- **🧹 Clean Cyberdeck Sidebar & Zero Rogue Borders**: Eradicated all rigid enclosing boxes, nested double frames, and smudged red pill badges across Gemini's sidebar:
-  - **Clean Monospace Rows**: List items render completely borderless with soft ice-blue text. Hovering displays a sleek left-notch sweep without enclosing boxes.
-  - **Single Active Data Cartridge**: The active session is highlighted purely by a 3.5px neon cyan vertical bar and soft cyan wash (no nested boxes).
-  - **Crisp Mainframe Headers**: `Notebooks` and `Recents` directory headers appear in clean golden amber with dashed cyan dividers (no blurry red pills).
-  - **Streamlined Operator Dock**: Circular cyan avatar ring with zero outer concentric circles or nested button ovals.
-  - **Translucent Cyberdeck Chassis**: Deep navy glass (`rgba(4, 8, 16, 0.82)`) with 14px backdrop blur and electric cyan conduit seam.
-- **⚡ Interactive Cyberdeck HUD Console**: An on-screen floating retro arcade console pinned discreetly to the corner. Expand it anytime to pause, reset, switch speed (0.5x, 1x, 2x), adjust quality, toggle CRT scanlines, toggle sound effects, change biomes, or view live Citadel HP and match records.
-- **🔊 Pure Web Audio 8-Bit Synthesizer Engine**: 100% self-contained algorithmic synthesizer producing authentic NES/arcade laser sweeps, filtered explosive booms, flak crackle, emergency sirens, and triumphant victory arpeggios. *Muted by default* — toggle on with a single click or `Alt + Shift + M`.
-- **🏆 Persistent Match Scoreboard**: Red vs Blue Citadel match history saved across browser refreshes via `localStorage`.
-- **💥 Smooth Victory Celebration**: When a Citadel falls, time enters dramatic 0.35x slow-motion as multi-colored firework sparks erupt into the night sky, surviving troops celebrate sector liberation, and the next wave initiates seamlessly.
-- **📐 Non-Destructive Responsive Resizing**: Resizing your browser window or opening DevTools no longer aborts ongoing matches — units, terrain, and projectiles dynamically scale coordinates without round resets.
-- **💎 Clean Monospace Cyberdeck UI**: Overrides Gemini's internal typography with uniform `Share Tech Mono`, isolates the single translucent cyan prompt bubble, preserves Google Material Symbol icons, and leaves Gemini 100% functional with deep background transparency.
+- **✨ Atmospheric & Typography Polish**:
+  - **Glowing Markdown Headings**: Model responses now feature neon cyan bloom `H1`/`H2` headers and golden amber `H3`/`H4` subheadings for enhanced visual hierarchy.
+  - **Tactical Ice-Blue Blockquotes**: Left-accented with an electric cyan conduit bar and 6% cyan tint fill.
+  - **Matrix Cyber Grid Tables**: Translucent dark navy tables with golden amber header cells, subtle dividers, and hover highlights.
+  - **Glowing Dotted Links**: Electric cyan text with neon magenta bloom on hover.
+  - **Active Session Cartridge Pulse**: Smooth horizontal gradient glow with a gentle breathing pulse animation (`@keyframes activeCartridgePulse`).
+- **🕹️ Tactile Feedback Across All Controls**:
+  - Added physical pressed states (`:active { transform: scale(...) }`) with laser bloom for **New Chat**, code block **Copy/Download** buttons, response **Thumbs/Copy/Edit** actions, and **Cyberdeck HUD** buttons.
+- **🛹 Ultra-Thin Custom Cyberdeck Scrollbars**:
+  - Sidebar scrollbar streamlined to 4px with a subtle translucent cyan thumb and hot magenta hover glow.
+- **🧹 Zero Rogue Borders**: Completely clean sidebar list items, transparent backgrounds preserving the live battle canvas, and zero nested red borders around prompt bubbles.
 
 ---
 

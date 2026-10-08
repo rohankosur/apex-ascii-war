@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      20.2.0
+// @version      20.3.0
 // @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini.
 // @author       rohankosur
 // @license      MIT
@@ -569,8 +569,89 @@
       outline: none !important;
       box-shadow: none !important;
       color: #e4f7ff !important;
-      line-height: 1.65 !important;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 240, 255, 0.3) !important;
+      line-height: 1.7 !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 240, 255, 0.25) !important;
+    }
+
+    /* Markdown Headings in Model Responses: Cyan Bloom & Golden Amber */
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) :is(h1, h2) {
+      color: #00f0ff !important;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6) !important;
+      font-weight: bold !important;
+      letter-spacing: 0.8px !important;
+      margin-top: 14px !important;
+      margin-bottom: 6px !important;
+    }
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) :is(h3, h4) {
+      color: #ffe600 !important;
+      text-shadow: 0 0 6px rgba(255, 230, 0, 0.5) !important;
+      font-weight: bold !important;
+      letter-spacing: 0.6px !important;
+      margin-top: 12px !important;
+      margin-bottom: 4px !important;
+    }
+
+    /* Links in Model Responses: Glowing Cyan with Hot Magenta Hover */
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) a {
+      color: #00f0ff !important;
+      text-decoration: underline dotted #00f0ff !important;
+      text-underline-offset: 3px !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) a:hover {
+      color: #ff2a6d !important;
+      text-decoration-color: #ff2a6d !important;
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.8) !important;
+    }
+
+    /* Blockquotes: Tactical Ice-Blue with Cyan Conduit Bar */
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) blockquote {
+      border-left: 3px solid #00f0ff !important;
+      background: rgba(0, 240, 255, 0.06) !important;
+      padding: 8px 14px !important;
+      margin: 10px 0 !important;
+      border-radius: 0 6px 6px 0 !important;
+      color: #aae0ff !important;
+      text-shadow: 0 0 4px rgba(0, 240, 255, 0.2) !important;
+    }
+
+    /* Markdown Tables: Tactical Cyberdeck Grid */
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) table {
+      border-collapse: collapse !important;
+      width: 100% !important;
+      margin: 12px 0 !important;
+      background: rgba(4, 10, 20, 0.55) !important;
+      border: 1px solid rgba(0, 240, 255, 0.25) !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+    }
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) th {
+      background: rgba(0, 240, 255, 0.12) !important;
+      color: #ffe600 !important;
+      font-weight: bold !important;
+      letter-spacing: 0.6px !important;
+      padding: 8px 12px !important;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.3) !important;
+      border-right: 1px solid rgba(0, 240, 255, 0.12) !important;
+      text-align: left !important;
+      font-size: 13px !important;
+    }
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) td {
+      padding: 7px 12px !important;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.1) !important;
+      border-right: 1px solid rgba(0, 240, 255, 0.08) !important;
+      color: #e4f7ff !important;
+      font-size: 13px !important;
+    }
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) tr:hover td {
+      background: rgba(0, 240, 255, 0.05) !important;
+    }
+
+    /* Horizontal Rules */
+    html.apex-war-enabled :is(.model-response, .model-response-text, [class*="model-response"]) hr {
+      border: none !important;
+      border-top: 1px dashed rgba(0, 240, 255, 0.3) !important;
+      margin: 16px 0 !important;
     }
 
     /* --- 5. USER PROMPT BUBBLE: SINGLE CLEAN PILL (ZERO MULTIPLE RED BORDERS) --- */
@@ -714,6 +795,9 @@
       color: #00f0ff !important;
       filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9)) !important;
       transform: scale(1.15) !important;
+    }
+    html.apex-war-enabled :is(code-block, .code-block, [class*="code-block"], div:has(> pre > code)) :is(button, [role="button"]):active {
+      transform: scale(0.9) !important;
     }
 
     /* Code typography: matrix green mono */
@@ -884,6 +968,10 @@
       box-shadow: 0 0 14px rgba(255, 42, 109, 0.4) !important;
       color: #ffffff !important;
       transform: translateX(2px) !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]):active {
+      transform: scale(0.97) translateX(1px) !important;
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.6) !important;
     }
     html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i]) :is(mat-icon, svg) {
       color: #00f0ff !important;
@@ -1067,16 +1155,21 @@
       [role="listitem"],
       mat-list-item
     ) :is(a, button):is(.selected, [aria-selected="true"], [aria-current="page"], [activated]) {
-      background: rgba(0, 240, 255, 0.12) !important;
+      background: linear-gradient(90deg, rgba(0, 240, 255, 0.16) 0%, rgba(0, 240, 255, 0.03) 100%) !important;
       border: none !important;
       border-left: 3.5px solid #00f0ff !important;
       border-radius: 4px !important;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2) !important;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.28) !important;
       color: #00f0ff !important;
       font-weight: bold !important;
-      text-shadow: 0 0 6px rgba(0, 240, 255, 0.6) !important;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.7) !important;
       margin: 2px 6px !important;
       padding: 7px 10px !important;
+      animation: activeCartridgePulse 3.5s infinite ease-in-out !important;
+    }
+    @keyframes activeCartridgePulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(0, 240, 255, 0.2); }
+      50% { box-shadow: 0 0 16px rgba(0, 240, 255, 0.42); }
     }
     html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
@@ -1237,6 +1330,13 @@
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.8)) !important;
     }
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):active {
+      transform: scale(0.9) !important;
+    }
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):active :is(mat-icon, svg) {
+      transform: scale(0.9) !important;
+      filter: drop-shadow(0 0 10px #ff2a6d) !important;
+    }
 
     /* Scrollbars: 80s Neon Cyber Sliders */
     html.apex-war-enabled ::-webkit-scrollbar {
@@ -1249,6 +1349,24 @@
       background: #00f0ff88;
       box-shadow: 0 0 6px #00f0ff;
       border-radius: 3px;
+    }
+
+    /* Sidebar-specific Ultra-Thin Cyberdeck Scrollbar */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar {
+      width: 4px !important;
+      height: 4px !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar-thumb {
+      background: rgba(0, 240, 255, 0.35) !important;
+      border-radius: 2px !important;
+      box-shadow: 0 0 4px rgba(0, 240, 255, 0.5) !important;
+    }
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar-thumb:hover {
+      background: #ff2a6d !important;
+      box-shadow: 0 0 8px #ff2a6d !important;
     }
 
     /* ── CYBERDECK RETRO ARCADE HUD CONSOLE & BADGE ── */
@@ -1283,6 +1401,9 @@
       color: #ffffff !important;
       box-shadow: 0 0 20px rgba(255, 42, 109, 0.6) !important;
       transform: translateY(-1px) !important;
+    }
+    #apex-hud-pill:active {
+      transform: scale(0.96) !important;
     }
 
     #apex-hud-pill .pulse-dot {
@@ -1410,6 +1531,9 @@
       color: #ffe6ef !important;
       box-shadow: 0 0 8px rgba(255, 42, 109, 0.5) !important;
     }
+    .apex-btn:active {
+      transform: scale(0.95) !important;
+    }
 
     .apex-footer-info {
       font-size: 9px !important;
@@ -1436,7 +1560,7 @@
     </div>
     <div id="apex-hud-panel" class="${settings.hudOpen ? '' : 'hidden'}">
       <div class="apex-panel-header">
-        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.0</span>
+        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.3.0</span>
         <button class="apex-panel-close" id="apex-hud-close" title="Minimize Console">✕</button>
       </div>
       <div class="apex-hp-section">
@@ -1637,7 +1761,7 @@
     getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '20.2.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.3.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
@@ -1646,7 +1770,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v20.2.0 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.3.0 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
