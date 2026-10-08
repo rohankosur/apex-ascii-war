@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      20.3.0
+// @version      20.3.1
 // @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini.
 // @author       rohankosur
 // @license      MIT
@@ -341,13 +341,26 @@
       position: relative;
       z-index: 1;
     }
-    /* Ensure all structural and scroll containers are transparent */
-    html.apex-war-enabled :is(chat-app, bard-app, main, .page-content, .main-content, .conversation-container, infinite-scroller, .chat-history, [class*="conversation"]) {
+    /* Ensure all structural, drawer and scroll containers are transparent with zero blur */
+    html.apex-war-enabled :is(
+      chat-app, bard-app, main, .page-content, .main-content,
+      mat-drawer-container, .mat-drawer-container, mat-drawer-content, .mat-drawer-content,
+      mat-sidenav-container, .mat-sidenav-container, mat-sidenav-content, .mat-sidenav-content,
+      .conversation-container, infinite-scroller, .chat-history, [class*="conversation"]
+    ) {
       background-color: transparent !important;
       background-image: none !important;
       background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
       --gem-sys-color--surface: transparent;
       --gem-sys-color--background: transparent;
+      --gem-sys-color--scrim: transparent;
+      --gem-sys-color-scrim: transparent;
+      --mat-sidenav-scrim-color: transparent;
+      --mat-drawer-scrim-color: transparent;
+      --mdc-drawer-scrim-color: transparent;
     }
 
     /* Force consistent Share Tech Mono across ALL text, headings, lists, prose & markdown */
@@ -823,21 +836,54 @@
     }
 
     /* ==========================================================================
+       SIDEBAR BACKDROP & SCRIM: ZERO BLUR, 100% TRANSPARENT
+       When sidebar opens, NEVER blur out or darken the live ASCII war simulation!
+       ========================================================================== */
+    html.apex-war-enabled :is(
+      mat-drawer-backdrop,
+      .mat-drawer-backdrop,
+      mat-sidenav-backdrop,
+      .mat-sidenav-backdrop,
+      .cdk-overlay-backdrop,
+      [class*="backdrop"],
+      [class*="scrim"],
+      [class*="drawer-backdrop"],
+      [class*="sidenav-backdrop"],
+      [class*="navigation-drawer-backdrop"],
+      [class*="side-nav-backdrop"]
+    ) {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+      background: transparent !important;
+      background-color: transparent !important;
+      box-shadow: none !important;
+      opacity: 0 !important;
+    }
+
+    /* ==========================================================================
        7. LEFT NAVIGATION SIDEBAR: 80s OUTRUN CYBERDECK (CLEAN & MINIMALIST)
        ========================================================================== */
 
     /* Main Navigation Drawer Chassis: Translucent Cyberdeck Glass + Laser Conduit Seam */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, .side-nav, [class*="side-nav"], [class*="navigation-drawer"], mat-sidenav) {
-      background: rgba(4, 8, 16, 0.82) !important;
-      background-color: rgba(4, 8, 16, 0.82) !important;
-      backdrop-filter: blur(14px) !important;
-      -webkit-backdrop-filter: blur(14px) !important;
+    html.apex-war-enabled :is(
+      side-navigation-drawer,
+      bard-sidenav,
+      mat-sidenav,
+      mat-drawer,
+      .navigation-drawer,
+      nav
+    ):not([class*="backdrop"]):not([class*="scrim"]):not([class*="container"]):not([class*="content"]):not([class*="wrapper"]) {
+      background: rgba(4, 8, 16, 0.72) !important;
+      background-color: rgba(4, 8, 16, 0.72) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       border: none !important;
       border-right: 1.5px solid rgba(0, 240, 255, 0.45) !important;
       box-shadow: 2px 0 20px rgba(0, 240, 255, 0.22) !important;
     }
 
-    /* Strip all solid background fills and rogue borders from inner drawer wrappers */
+    /* Strip all solid background fills, blurs, and rogue borders from inner drawer wrappers */
     html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, mat-sidenav) :is(
       .mat-drawer-inner-container,
       [class*="inner-container"],
@@ -848,6 +894,9 @@
     ) {
       background: transparent !important;
       background-color: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
@@ -1245,8 +1294,9 @@
     ) {
       border: none !important;
       border-top: 1.5px solid rgba(0, 240, 255, 0.35) !important;
-      background: rgba(5, 10, 22, 0.85) !important;
-      backdrop-filter: blur(12px) !important;
+      background: rgba(5, 10, 22, 0.78) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       padding: 10px 14px !important;
       box-shadow: 0 -4px 14px rgba(0, 240, 255, 0.1) !important;
     }
@@ -1560,7 +1610,7 @@
     </div>
     <div id="apex-hud-panel" class="${settings.hudOpen ? '' : 'hidden'}">
       <div class="apex-panel-header">
-        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.3.0</span>
+        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.3.1</span>
         <button class="apex-panel-close" id="apex-hud-close" title="Minimize Console">✕</button>
       </div>
       <div class="apex-hp-section">
@@ -1761,7 +1811,7 @@
     getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '20.3.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.3.1', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
@@ -1770,7 +1820,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v20.3.0 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.3.1 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {

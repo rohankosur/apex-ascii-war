@@ -1,6 +1,6 @@
-# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.3
+# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.3.1
 
-[![Version](https://img.shields.io/badge/version-20.3.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
+[![Version](https://img.shields.io/badge/version-20.3.1-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ff2a6d.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Gemini-ffe600.svg?style=flat-square)](https://gemini.google.com/)
 [![Audio](https://img.shields.io/badge/audio-8--Bit%20Web%20Audio%20Synth-39ff14.svg?style=flat-square)](#-8-bit-web-audio-synthesizer)
@@ -10,10 +10,14 @@
 
 ---
 
-## 🎮 Highlights & New in v20.3.0
+## 🎮 Highlights & New in v20.3.1
 
+- **🛡️ Zero Backdrop Blur (Sidebar Open Fix)**:
+  - **Full-Screen Canvas Clarity**: Completely eradicated Angular Material's drawer backdrop blur and opaque scrim overlay (`mat-drawer-backdrop`, `cdk-overlay-backdrop`, `[class*="backdrop"]`, `[class*="scrim"]`). The entire ASCII war simulation remains 100% visible, razor-sharp, and unblurred when the sidebar drawer is expanded.
+  - **Translucent Glass Chassis**: Removed smudging 14px blur filters from the sidebar drawer and operator dock, allowing dogfights and orbital beams passing under the drawer to remain visible through translucent dark glass.
+  - **Click-to-Dismiss Intact**: The backdrop remains transparent with full pointer event capture, allowing one-click sidebar dismissal.
 - **✨ Atmospheric & Typography Polish**:
-  - **Glowing Markdown Headings**: Model responses now feature neon cyan bloom `H1`/`H2` headers and golden amber `H3`/`H4` subheadings for enhanced visual hierarchy.
+  - **Glowing Markdown Headings**: Model responses feature neon cyan bloom `H1`/`H2` headers and golden amber `H3`/`H4` subheadings for enhanced visual hierarchy.
   - **Tactical Ice-Blue Blockquotes**: Left-accented with an electric cyan conduit bar and 6% cyan tint fill.
   - **Matrix Cyber Grid Tables**: Translucent dark navy tables with golden amber header cells, subtle dividers, and hover highlights.
   - **Glowing Dotted Links**: Electric cyan text with neon magenta bloom on hover.
@@ -22,7 +26,6 @@
   - Added physical pressed states (`:active { transform: scale(...) }`) with laser bloom for **New Chat**, code block **Copy/Download** buttons, response **Thumbs/Copy/Edit** actions, and **Cyberdeck HUD** buttons.
 - **🛹 Ultra-Thin Custom Cyberdeck Scrollbars**:
   - Sidebar scrollbar streamlined to 4px with a subtle translucent cyan thumb and hot magenta hover glow.
-- **🧹 Zero Rogue Borders**: Completely clean sidebar list items, transparent backgrounds preserving the live battle canvas, and zero nested red borders around prompt bubbles.
 
 ---
 
