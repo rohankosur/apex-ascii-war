@@ -1,6 +1,6 @@
-# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.3.2
+# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.4.0
 
-[![Version](https://img.shields.io/badge/version-20.3.2-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
+[![Version](https://img.shields.io/badge/version-20.4.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ff2a6d.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Gemini-ffe600.svg?style=flat-square)](https://gemini.google.com/)
 [![Audio](https://img.shields.io/badge/audio-8--Bit%20Web%20Audio%20Synth-39ff14.svg?style=flat-square)](#-8-bit-web-audio-synthesizer)
@@ -10,17 +10,15 @@
 
 ---
 
-## 🎮 Highlights & New in v20.3.2
+## 🎮 Highlights & New in v20.4.0 (Gemini 2026 Redesign Update)
 
-- **💎 Code Block Glyph & Atmosphere Restoration**:
-  - **Unblurred Background**: Eradicated the 8px blur filter on code blocks (`backdrop-filter: none !important;`). The retro Outrun sun, skyline buildings, and cyan lasers behind code blocks are now 100% visible and sharp through the dark translucent green glass.
-  - **Copy Code & Download Code Icons Restored**: Imported official Google Material Symbols font (`Material Symbols Outlined`), eliminated width constraints that clipped multi-character ligatures (`content_copy` and `download`), and protected button children from monospace text font overrides.
-- **🧹 Sidebar Header & Spark BETA Clean-Up**:
-  - **Zero Nested BETA Boxes**: Stripped outer button borders from the "Spark BETA" tab, locking the magenta border strictly to the inner `BETA` microchip pill (`border: 1px solid rgba(255, 42, 109, 0.65)`).
-  - **Borderless Top Header**: Eradicated the awkward cyan pill card that enclosed the Gemini logo and channel switcher.
-  - **Unified Monospace Typography**: Enforced `Share Tech Mono` across "Gemini", "Chat", and "Spark" text labels, eliminating mismatched Google Sans.
-- **🛡️ Zero Backdrop Blur (Sidebar Open Fix)**:
-  - Completely eradicated Angular Material's drawer backdrop blur and opaque scrim overlay (`mat-drawer-backdrop`, `cdk-overlay-backdrop`). The entire ASCII war simulation remains 100% visible, razor-sharp, and unblurred when the sidebar drawer is open.
+- **🌌 Google Gemini 2026 Neural Expressive & GDS Redesign Compatibility**:
+  - **Full Support for `<input-area-v2>`**: Fully styled Gemini's new prompt chassis with translucent cyberdeck dark glass (`rgba(5, 9, 20, 0.62)`), crisp 1.5px cyan laser borders, and neon send buttons.
+  - **Eradication of Ambient Glow Smudges & Neural Expressive Blurs**: Google introduced `.lm-glow`, `.blur-bg`, `<chat-loading-animation>`, and `.nl-canvas` (`.nl-blob`, `.gradient-strip` with 146px blur). All ambient glow smudges have been eradicated (`display: none !important`), restoring deep pitch-black transparency so the ASCII war battlefield and neon arcade sun remain 100% visible and razor-sharp.
+  - **Luminous Symbols Font Protection**: Added shielding for Google's new `@font-face` `'Luminous Symbols'` (`.lumi-symbols`, `<gem-icon>`). Ligatures like `plus`, `mic`, `send`, `side_nav`, and `image_create` now render with crisp vector graphics instead of broken text ligatures.
+  - **Modern Model Switcher & Tools Drawer**: Styled `<gem-menu>`, `<gem-menu-item>`, `<new-model-picker-glow>`, `<toolbox-drawer>`, and `<mat-card class="card-container">` with cyberdeck glass and neon cyan/magenta styling.
+  - **Next-Gen Sidebar Chassis**: Seamlessly compatible with `<side-navigation-v2>`, `<side-navigation-content>`, `<gem-nav-list-item>`, and `<sidenav-mavatar-footer>`.
+  - **Self-Healing DOM Engine**: Added auto-reattachment checks in the animation loop to ensure the battle canvas and HUD console never detach during Angular route changes or chat resets.
 
 ---
 
@@ -114,8 +112,8 @@ The sound engine is synthesized in real time using the native browser `AudioCont
 ### One-Click Install (Tampermonkey / Violentmonkey)
 1. Install [Tampermonkey](https://www.tampermonkey.net/) in Chrome, Brave, or Edge.
 2. Click this direct raw link:  
-   👉 **[Install apex-ascii-war.user.js (v20.2.0)](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js)**
-3. Tampermonkey will prompt you to install/update to **v20.2.0**. Click **Install** (or **Update**).
+   👉 **[Install apex-ascii-war.user.js (v20.4.0)](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js)**
+3. Tampermonkey will prompt you to install/update to **v20.4.0**. Click **Install** (or **Update**).
 4. Navigate to [`https://gemini.google.com/`](https://gemini.google.com/) and refresh the page!
 
 ---

@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      20.3.2
-// @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini.
+// @version      20.4.0
+// @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini (Full Gemini 2026 Neural Expressive & GDS Support).
 // @author       rohankosur
 // @license      MIT
 // @match        https://gemini.google.com/*
@@ -327,6 +327,26 @@
       --mat-sys-font-body-large: 'Share Tech Mono', monospace !important;
       --mat-sys-font-body-medium: 'Share Tech Mono', monospace !important;
       --mat-sys-font-body-small: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-body-large: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-body-medium: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-body-small: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-label-large: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-label-medium: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-label-small: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-title-large: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-title-medium: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-title-small: 'Share Tech Mono', monospace !important;
+      --gds-sys-font-display-large: 'VT323', monospace !important;
+      --gds-sys-font-display-medium: 'VT323', monospace !important;
+      --gds-sys-font-display-small: 'VT323', monospace !important;
+      --gds-sys-color-surface: transparent !important;
+      --gds-sys-color-background: transparent !important;
+      --gds-sys-color-surface-container: transparent !important;
+      --gds-sys-color-surface-container-high: transparent !important;
+      --gds-sys-color-surface-container-low: transparent !important;
+      --gds-sys-color-surface-container-lowest: transparent !important;
+      --gem-sys-color--surface: transparent !important;
+      --gem-sys-color--background: transparent !important;
     }
     html.apex-war-enabled {
       background: #04060e !important;
@@ -337,16 +357,22 @@
       isolation: isolate;
       font-family: 'Share Tech Mono', monospace !important;
     }
-    html.apex-war-enabled :is(chat-app, bard-app) {
+    html.apex-war-enabled :is(chat-app-orchestrator, chat-app, bard-app, bard-sidenav-container, bard-sidenav-content) {
       position: relative;
       z-index: 1;
     }
-    /* Ensure all structural, drawer and scroll containers are transparent with zero blur */
+    /* Ensure all structural, drawer, chat window and scroll containers are transparent with zero blur */
     html.apex-war-enabled :is(
-      chat-app, bard-app, main, .page-content, .main-content,
+      chat-app-orchestrator, chat-app, bard-app, main, .page-content, .main-content,
       mat-drawer-container, .mat-drawer-container, mat-drawer-content, .mat-drawer-content,
       mat-sidenav-container, .mat-sidenav-container, mat-sidenav-content, .mat-sidenav-content,
-      .conversation-container, infinite-scroller, .chat-history, [class*="conversation"]
+      bard-sidenav-container, bard-sidenav-content, side-navigation-v2, side-navigation-content,
+      .conversation-container, infinite-scroller, .chat-history, [class*="conversation"],
+      chat-window, chat-window-content, .chat-container, .chat-history-scroll-container,
+      modular-zero-state, .modular-zero-state-container, zero-state-banners, zero-state-block-picker,
+      assistant-messages-primary, .assistant-messages-primary-container, .content-container,
+      zero-state-disclaimers, .human-review-disclosure-container, hallucination-disclaimer,
+      input-container, .input-area-container
     ) {
       background-color: transparent !important;
       background-image: none !important;
@@ -363,6 +389,20 @@
       --mdc-drawer-scrim-color: transparent;
     }
 
+    /* Completely eliminate Neural Expressive background animation blobs & ambient blurs */
+    html.apex-war-enabled :is(
+      .lm-glow, .blur-bg, chat-loading-animation, .nl-canvas, .nl-bg-layer, .nl-fg-layer,
+      .nl-blob, .gradient-strip, .top-gradient, .bottom-gradient
+    ) {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+    }
+
     /* Force consistent Share Tech Mono across ALL text, headings, lists, prose & markdown */
     html.apex-war-enabled :is(
       p, li, ul, ol, label, input, textarea,
@@ -371,7 +411,7 @@
       .model-response-text, .response-content, .markdown, message-content,
       .text-input-field, rich-textarea, .ql-editor
     ),
-    html.apex-war-enabled :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, .markdown, .model-response-text) :is(span:not([class*="symbol"]):not([class*="icon"]):not([class*="mat-"]):not([class*="google"]):not(button *):not([role="button"] *), a, strong, em, b, i:not([class*="material"]):not([class*="icon"])) {
+    html.apex-war-enabled :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, .markdown, .model-response-text) :is(span:not([class*="symbol"]):not([class*="icon"]):not([class*="mat-"]):not([class*="google"]):not([class*="lumi"]):not(button *):not([role="button"] *), a, strong, em, b, i:not([class*="material"]):not([class*="icon"])) {
       font-family: 'Share Tech Mono', monospace !important;
       letter-spacing: 0.35px !important;
     }
@@ -382,6 +422,9 @@
       [class*="mat-icon"],
       .google-symbols,
       [class*="google-symbols"],
+      .lumi-symbols,
+      [class*="lumi-symbols"],
+      gem-icon,
       .material-symbols-outlined,
       .material-symbols-rounded,
       .material-symbols-sharp,
@@ -389,13 +432,14 @@
       [fonticon],
       [data-mat-icon-type],
       [data-mat-icon-name],
+      [data-mat-icon-namespace],
       i[class*="material"],
       span[class*="symbol"],
       span[class*="icon"],
       [class*="symbol"],
       [class*="icon"]
     ) {
-      font-family: 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons' !important;
+      font-family: 'Luminous Symbols', 'Google Symbols', 'Material Symbols Outlined', 'Material Symbols Rounded', 'Material Icons' !important;
       font-style: normal !important;
       font-weight: normal !important;
       letter-spacing: normal !important;
@@ -405,6 +449,7 @@
       word-wrap: normal !important;
       font-feature-settings: 'liga' 1 !important;
       -webkit-font-feature-settings: 'liga' 1 !important;
+      font-variant-ligatures: normal !important;
       -webkit-font-smoothing: antialiased !important;
     }
 
@@ -423,22 +468,27 @@
       opacity: 0.42;
     }
 
-    /* Gemini Hero Greeting: 80s Outrun Arcade Title Screen (Only in hero greeting container) */
-    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], [class*="greeting"]) :is(h1, .title, [class*="title"]),
-    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], .greeting-title, [class*="greeting-title"]) {
+    /* Gemini Hero Greeting: 80s Outrun Arcade Title Screen */
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], [class*="greeting"], assistant-messages-primary, .assistant-messages-primary-container) :is(h1, .title, [class*="title"], .message-text),
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], .greeting-title, [class*="greeting-title"], h1.gds-display-m) {
       font-family: 'VT323', monospace !important;
       font-size: 3.4rem !important;
       letter-spacing: 5px !important;
       background: linear-gradient(180deg, #ffffff 0%, #00f0ff 45%, #ff2a6d 100%) !important;
       -webkit-background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
-      filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.85)) drop-shadow(0 0 26px rgba(255, 42, 109, 0.6)) !important;
       text-transform: uppercase !important;
       text-align: center !important;
       display: block !important;
     }
-    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], .greeting-title, [class*="greeting-title"])::after,
-    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], [class*="greeting"]) > :is(h1, .title)::after {
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], assistant-messages-primary) h1.gds-display-m {
+      filter: none !important;
+    }
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], assistant-messages-primary) :is(.message-text, .title, [class*="title"]) {
+      filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.75)) drop-shadow(0 0 18px rgba(255, 42, 109, 0.5)) !important;
+    }
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], .greeting-title, [class*="greeting-title"], assistant-messages-primary)::after,
+    html.apex-war-enabled :is(.greeting, [data-test-id="greeting"], [class*="greeting"], assistant-messages-primary) > :is(h1, .title, .content-container, .content-wrapper)::after {
       content: '►► 1P CO-OP CYBERDECK // INSERT COIN TO INITIATE ◄◄';
       display: block;
       font-family: 'Share Tech Mono', monospace !important;
@@ -458,18 +508,20 @@
     /* --- 2. INPUT CHASSIS: SINGLE CLEAN PILL (NO WEIRD BUTTON BOXES) --- */
 
     /* Reset all outer and parent wrappers */
-    html.apex-war-enabled :is(chat-window-input, .input-area, .input-container, .input-area-container) {
+    html.apex-war-enabled :is(chat-window-input, .input-area, .input-container, .input-area-container, input-container) {
       background: transparent !important;
       border: none !important;
       box-shadow: none !important;
       outline: none !important;
     }
 
-    /* Single Outer Cyberdeck Input Chassis */
+    /* Single Outer Cyberdeck Input Chassis (Supports legacy input-box and 2026 input-area-v2) */
     html.apex-war-enabled div.input-box,
+    html.apex-war-enabled input-area-v2,
     html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child {
       background: rgba(5, 9, 20, 0.62) !important;
       backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
       border: 1.5px solid #00f0ff !important;
       border-radius: 8px !important;
       box-shadow: 0 0 14px rgba(0, 240, 255, 0.35), inset 0 0 10px rgba(0, 240, 255, 0.06) !important;
@@ -478,18 +530,36 @@
 
     /* Focus State: Hot Magenta */
     html.apex-war-enabled div.input-box:focus-within,
+    html.apex-war-enabled input-area-v2:focus-within,
     html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child:focus-within {
       border-color: #ff2a6d !important;
       box-shadow: 0 0 22px rgba(255, 42, 109, 0.6), inset 0 0 14px rgba(255, 42, 109, 0.12) !important;
     }
 
     /* All inner containers and buttons inside the input box: NO borders, NO rogue boxes! */
-    html.apex-war-enabled div.input-box :is(div, span, section, p, form, rich-textarea, .text-input-field, button, [role="button"]) {
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is(
+      div, span, section, p, form, fieldset, rich-textarea, .text-input-field,
+      .input-area-fieldset, .simplified-input-area, .leading-actions-wrapper, .trailing-actions-wrapper,
+      button, [role="button"], simplified-input-menu, new-model-picker-glow
+    ) {
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
       background: transparent !important;
       background-color: transparent !important;
+    }
+
+    /* Clean model picker glow halo/ring removal (keep content visible) */
+    html.apex-war-enabled new-model-picker-glow {
+      display: inline-flex !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    html.apex-war-enabled new-model-picker-glow :is(.glow-halo, .glow-ring) {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
     }
 
     /* Input text formatting */
@@ -500,28 +570,160 @@
       caret-color: #00f0ff !important;
     }
 
-    /* Model Selector (Flash dropdown) inside input box: clean text, no box */
-    html.apex-war-enabled div.input-box :is([data-test-id*="model"], [class*="model-picker"]) {
+    /* Model Selector inside input box (Flash / Pro / Argon / Thinking dropdown): clean text, no box */
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is([data-test-id*="model"], [class*="model-picker"], .input-area-switch, bard-mode-switcher) {
       color: #00f0ff !important;
+      font-family: 'Share Tech Mono', monospace !important;
       font-size: 13px !important;
-      opacity: 0.85;
-      padding: 0 4px !important;
+      letter-spacing: 0.5px !important;
+      opacity: 0.9;
+      padding: 0 6px !important;
+      transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled div.input-box :is([data-test-id*="model"], [class*="model-picker"]):hover {
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is([data-test-id*="model"], [class*="model-picker"], .input-area-switch, bard-mode-switcher):hover {
       opacity: 1;
       color: #ff2a6d !important;
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.7) !important;
+    }
+
+    /* Model Picker Menu & Context Overlays: Cyberdeck Translucent Card */
+    html.apex-war-enabled :is(gem-menu, [role="menu"], mat-menu-panel, .mat-mdc-menu-panel, gem-popover, .cdk-overlay-pane:has(gem-menu)) {
+      background: rgba(6, 12, 24, 0.94) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border: 1.5px solid rgba(0, 240, 255, 0.45) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.08) !important;
+      padding: 6px !important;
+    }
+    html.apex-war-enabled :is(gem-menu-item, [role="menuitem"], .mat-mdc-menu-item) {
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #cbe9ff !important;
+      background: transparent !important;
+      border: none !important;
+      border-left: 2.5px solid transparent !important;
+      border-radius: 4px !important;
+      margin: 2px 0 !important;
+      padding: 8px 12px !important;
+      transition: all 0.18s ease !important;
+    }
+    html.apex-war-enabled :is(gem-menu-item, [role="menuitem"], .mat-mdc-menu-item) :is(span, div, p, label) {
+      font-family: 'Share Tech Mono', monospace !important;
+      color: inherit !important;
+    }
+    html.apex-war-enabled :is(gem-menu-item, [role="menuitem"], .mat-mdc-menu-item):is(:hover, :focus, .active) {
+      border-left: 3px solid #ff2a6d !important;
+      background: linear-gradient(90deg, rgba(255, 42, 109, 0.18) 0%, transparent 100%) !important;
+      color: #ff2a6d !important;
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.7) !important;
+      transform: translateX(2px) !important;
+    }
+    html.apex-war-enabled :is(gem-menu-item, [role="menuitem"], .mat-mdc-menu-item):is(.selected, [aria-checked="true"], [aria-selected="true"]) {
+      border-left: 3px solid #00f0ff !important;
+      background: linear-gradient(90deg, rgba(0, 240, 255, 0.18) 0%, transparent 100%) !important;
+      color: #00f0ff !important;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.7) !important;
+    }
+
+    /* Toolbox Drawer & Action Card ("+" Upload & Tools Popup) */
+    html.apex-war-enabled :is(
+      mat-card, .mat-mdc-card, .card-container, toolbox-drawer,
+      .toolbox-drawer-container, mat-action-list, .mat-mdc-action-list, .menu-list-container
+    ) {
+      background: rgba(6, 12, 24, 0.94) !important;
+      background-color: rgba(6, 12, 24, 0.94) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border: 1.5px solid rgba(0, 240, 255, 0.45) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3) !important;
+      color: #cbe9ff !important;
+    }
+    html.apex-war-enabled :is(mat-card, .mat-mdc-card, toolbox-drawer) :is(
+      button, [role="button"], mat-list-item, toolbox-drawer-item, .toolbox-drawer-item-list-button, .mat-mdc-list-item
+    ) {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      border-left: 2px solid transparent !important;
+      border-radius: 4px !important;
+      color: #cbe9ff !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      transition: all 0.18s ease !important;
+    }
+    html.apex-war-enabled :is(mat-card, .mat-mdc-card, toolbox-drawer) :is(span, p, div, label) {
+      font-family: 'Share Tech Mono', monospace !important;
+      color: inherit !important;
+    }
+    html.apex-war-enabled :is(mat-card, .mat-mdc-card, toolbox-drawer) :is(
+      button, [role="button"], mat-list-item, toolbox-drawer-item, .toolbox-drawer-item-list-button
+    ):hover {
+      background: linear-gradient(90deg, rgba(255, 42, 109, 0.18) 0%, transparent 100%) !important;
+      border-left: 3px solid #ff2a6d !important;
+      color: #ff2a6d !important;
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.7) !important;
+    }
+    html.apex-war-enabled :is(mat-card, .mat-mdc-card, toolbox-drawer) :is(mat-icon, svg, gem-icon) {
+      color: #00f0ff !important;
+      fill: #00f0ff !important;
+      filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
+    }
+    html.apex-war-enabled :is(mat-card, .mat-mdc-card, toolbox-drawer) button:hover :is(mat-icon, svg, gem-icon) {
+      color: #ff2a6d !important;
+      fill: #ff2a6d !important;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
+    }
+    html.apex-war-enabled :is(mat-card, .mat-mdc-card) :is(.signed-out, [class*="footer"], [class*="promo"]) {
+      background: rgba(10, 18, 36, 0.8) !important;
+      border-top: 1px solid rgba(0, 240, 255, 0.3) !important;
+      color: #cbe9ff !important;
+    }
+
+    /* Top Header & Business / App Links */
+    html.apex-war-enabled :is(header, [class*="header"], nav[aria-label*="banner" i]) :is(a, button) {
+      font-family: 'Share Tech Mono', monospace !important;
+      color: #00f0ff !important;
+      font-size: 13px !important;
+      transition: all 0.2s ease !important;
+    }
+    html.apex-war-enabled :is(header, [class*="header"]) a:hover {
+      color: #ff2a6d !important;
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.7) !important;
+    }
+    html.apex-war-enabled :is(header, [class*="header"]) button:has(span, a) {
+      background: transparent !important;
+      border: 1px solid #00f0ff !important;
+      border-radius: 4px !important;
+      color: #00f0ff !important;
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.3) !important;
+    }
+    html.apex-war-enabled :is(header, [class*="header"]) button:has(span, a):hover {
+      border-color: #ff2a6d !important;
+      color: #ff2a6d !important;
+      box-shadow: 0 0 12px rgba(255, 42, 109, 0.5) !important;
+    }
+
+    /* Disclaimers & Zero State Notices */
+    html.apex-war-enabled :is(zero-state-disclaimers, .human-review-disclosure-container, hallucination-disclaimer, [class*="disclaimer"]) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: #64748b !important;
+      font-family: 'Share Tech Mono', monospace !important;
+      font-size: 11px !important;
+      text-align: center !important;
     }
 
     /* --- 3. RETRO ARCADE ICONS & ACTION BUTTONS --- */
 
     /* Global Navigation Drawer & Sidebar Icons */
-    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav, .side-nav, header) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, .side-nav, header) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, .navigation-drawer, nav) :is(button:hover, a:hover, [role="button"]:hover) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(button:hover, a:hover, [role="button"]:hover) :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
@@ -535,13 +737,13 @@
     }
 
     /* Input Bar Buttons (+ Attach, Mic, Tools) */
-    html.apex-war-enabled div.input-box :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled div.input-box :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]):hover :is(mat-icon, svg) {
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is(button, [role="button"]):not(.send-button):not([aria-label*="Send" i]):hover :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
@@ -556,7 +758,7 @@
       box-shadow: 0 0 12px rgba(255, 42, 109, 0.75) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(.send-button, [aria-label*="Send" i], [data-test-id*="send"]) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(.send-button, [aria-label*="Send" i], [data-test-id*="send"]) :is(mat-icon, svg, gem-icon) {
       color: #ffffff !important;
       fill: #ffffff !important;
       filter: drop-shadow(0 0 4px #ffffff) !important;
@@ -890,6 +1092,8 @@
     html.apex-war-enabled :is(
       side-navigation-drawer,
       bard-sidenav,
+      side-navigation-v2,
+      side-navigation-content,
       mat-sidenav,
       mat-drawer,
       .navigation-drawer,
@@ -905,8 +1109,11 @@
     }
 
     /* Strip all solid background fills, blurs, and rogue borders from inner drawer wrappers */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, mat-sidenav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, mat-sidenav) :is(
       .mat-drawer-inner-container,
+      .sidenav-with-history-container,
+      .overflow-container,
+      .top-action-list,
       [class*="inner-container"],
       [class*="content-wrapper"],
       [class*="scrollable"],
@@ -924,8 +1131,8 @@
     }
 
     /* Universal Border Wipe: NEVER allow rogue boxes or nested borders inside sidebar items */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, mat-sidenav) :is(
-      ul, li, [role="list"], [role="listitem"], mat-list-item,
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, mat-sidenav) :is(
+      ul, li, [role="list"], [role="listitem"], mat-list-item, gem-nav-list-item,
       [class*="item"], [class*="entry"], [class*="link"],
       a, button
     ) {
@@ -935,8 +1142,8 @@
     }
 
     /* Reset ALL child elements inside list items to be completely borderless & transparent */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, mat-sidenav) :is(
-      [role="listitem"], mat-list-item, [class*="nav-item"], [class*="conversation-item"], [class*="history-item"], [class*="notebook-item"]
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, mat-sidenav) :is(
+      [role="listitem"], mat-list-item, gem-nav-list-item, [class*="nav-item"], [class*="conversation-item"], [class*="history-item"], [class*="notebook-item"]
     ) :is(div, span, p, a, button) {
       border: none !important;
       outline: none !important;
@@ -946,7 +1153,7 @@
     }
 
     /* Top Header & Gemini Title (Clean, NO outer box) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is([class*="title"], [class*="logo-text"], .gemini-logo, [aria-label*="Gemini"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is([class*="title"], [class*="logo-text"], .gemini-logo, [aria-label*="Gemini"]) {
       background: linear-gradient(135deg, #00f0ff 0%, #ff2a6d 100%) !important;
       -webkit-background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
@@ -958,27 +1165,28 @@
       filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)) !important;
     }
 
-    /* Enforce Share Tech Mono across sidebar text and labels */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
-      [class*="title"], [class*="logo"], [class*="text"], [class*="label"], span, a, button, p
-    ):not(:is(mat-icon, [class*="mat-icon"], .google-symbols, [class*="google-symbols"], [fonticon], [data-mat-icon-type], i, svg, svg *)) {
+    /* Enforce Share Tech Mono across sidebar text and labels (Bright cyan-white font) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
+      [class*="title"], [class*="logo"], [class*="text"], [class*="label"], .title-text, .gds-body-s, .label-and-badge, span, a, button, p
+    ):not(:is(mat-icon, [class*="mat-icon"], .google-symbols, .lumi-symbols, [class*="lumi-symbols"], [fonticon], [data-mat-icon-type], i, svg, svg *)) {
       font-family: 'Share Tech Mono', monospace !important;
+      color: #cbe9ff !important;
     }
 
     /* Header Hamburger Menu Button */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]) {
       background: transparent !important;
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.7)) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]):hover :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, header) :is([aria-label*="menu" i], [aria-label*="drawer" i], [class*="menu-button"]):hover :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 10px rgba(255, 42, 109, 0.9)) !important;
@@ -986,7 +1194,7 @@
     }
 
     /* Segmented Mode Switcher: Clean, Borderless & Minimalist (Chat | Spark) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
       [role="tablist"],
       [class*="mode-switcher"],
       [class*="tab-group"],
@@ -1004,7 +1212,7 @@
     }
 
     /* Individual Mode Switcher Buttons / Tabs */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
       [role="tab"],
       [class*="segmented-button"] button,
       [class*="mode-switcher"] button,
@@ -1025,7 +1233,7 @@
     }
 
     /* Active Channel Tab (Chat) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
       [role="tab"][aria-selected="true"],
       [role="tab"].selected,
       [class*="segmented-button"] button[class*="selected"],
@@ -1044,7 +1252,7 @@
     }
 
     /* Ensure parent buttons, tabs and wrappers around BETA badges NEVER produce an outer border */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(button, [role="tab"], a, div):has(:is([class*="badge"], [class*="beta"])) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(button, [role="tab"], a, div):has(:is([class*="badge"], [class*="beta"])) {
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
@@ -1053,7 +1261,7 @@
     }
 
     /* Spark "BETA" Microchip Badge: Single Clean Crisp Pill */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav, header) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
       span[class*="badge"],
       span[class*="beta"],
       [class*="beta-badge"],
@@ -1083,7 +1291,7 @@
     }
 
     /* "New Chat" Action Button */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]) {
       background: rgba(0, 240, 255, 0.08) !important;
       border: 1px solid rgba(0, 240, 255, 0.35) !important;
       border-radius: 8px !important;
@@ -1097,31 +1305,31 @@
       padding: 8px 12px !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]):hover {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]):hover {
       background: rgba(255, 42, 109, 0.12) !important;
       border-color: #ff2a6d !important;
       box-shadow: 0 0 14px rgba(255, 42, 109, 0.4) !important;
       color: #ffffff !important;
       transform: translateX(2px) !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]):active {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i], [class*="new-chat-button"]):active {
       transform: scale(0.97) translateX(1px) !important;
       box-shadow: 0 0 6px rgba(0, 240, 255, 0.6) !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i]) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i]) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 6px #00f0ff) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i]):hover :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([aria-label*="New chat" i], [data-test-id*="new-chat" i]):hover :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px #ff2a6d) !important;
     }
 
     /* Top Nav Items (Search chats, Daily brief, Students, Videos, Library, Labs) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"]) :is(a, button, [role="button"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([role="listitem"], gem-nav-list-item, [class*="nav-item"], [class*="nav-entry"]) :is(a, button, [role="button"]) {
       color: #c4def6 !important;
       font-family: 'Share Tech Mono', monospace !important;
       font-size: 13px !important;
@@ -1133,7 +1341,7 @@
       margin: 2px 6px !important;
       transition: all 0.18s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"]) :is(a, button, [role="button"]):hover {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([role="listitem"], gem-nav-list-item, [class*="nav-item"], [class*="nav-entry"]) :is(a, button, [role="button"]):hover {
       border: none !important;
       border-left: 3px solid #00f0ff !important;
       background: linear-gradient(90deg, rgba(0, 240, 255, 0.12) 0%, transparent 100%) !important;
@@ -1142,13 +1350,13 @@
       transform: translateX(3px) !important;
     }
     /* Icons in Nav Items */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"]) :is(mat-icon, svg, [fonticon]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([role="listitem"], gem-nav-list-item, [class*="nav-item"], [class*="nav-entry"]) :is(mat-icon, svg, [fonticon], gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6)) !important;
       transition: all 0.18s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([role="listitem"], [class*="nav-item"], [class*="nav-entry"]):hover :is(mat-icon, svg, [fonticon]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is([role="listitem"], gem-nav-list-item, [class*="nav-item"], [class*="nav-entry"]):hover :is(mat-icon, svg, [fonticon], gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.85)) !important;
@@ -1156,7 +1364,7 @@
     }
 
     /* Mainframe Directory Headers: Notebooks & Recents (Clean Amber Text, ZERO Red Smudges!) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="category"],
       [class*="section-header"],
       [class*="recents-header"],
@@ -1183,7 +1391,7 @@
       align-items: center !important;
       justify-content: space-between !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="category"],
       [class*="section-header"],
       [class*="recents-header"],
@@ -1199,14 +1407,15 @@
     }
 
     /* Notebook & History List Items: Base Clean Monospace Rows (ZERO Rogue Boxes!) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
+      mat-list-item,
+      gem-nav-list-item
     ) {
       background: transparent !important;
       background-color: transparent !important;
@@ -1214,15 +1423,16 @@
       outline: none !important;
       box-shadow: none !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ) :is(a, button, [role="button"], [class*="conversation-entry"], [class*="entry-container"]) {
+      mat-list-item,
+      gem-nav-list-item
+    ) :is(a, button, [role="button"], [class*="conversation-entry"], [class*="entry-container"], .item-container) {
       color: #cbe9ff !important;
       font-family: 'Share Tech Mono', monospace !important;
       font-size: 13px !important;
@@ -1236,15 +1446,16 @@
       box-shadow: none !important;
       transition: all 0.18s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ) :is(a, button, [role="button"], [class*="conversation-entry"]) :is(span, p, div, [class*="title"], [class*="text"]) {
+      mat-list-item,
+      gem-nav-list-item
+    ) :is(a, button, [role="button"], [class*="conversation-entry"], .item-container) :is(span, p, div, [class*="title"], [class*="text"], .title-text) {
       color: inherit !important;
       font-family: 'Share Tech Mono', monospace !important;
       border: none !important;
@@ -1254,15 +1465,16 @@
     }
 
     /* Hover on History & Notebook Items: Hot Magenta Left-Notch Sweep ONLY (NO full box!) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ) :is(a, button, [role="button"], [class*="conversation-entry"]):hover {
+      mat-list-item,
+      gem-nav-list-item
+    ) :is(a, button, [role="button"], [class*="conversation-entry"], .item-container):hover {
       border: none !important;
       border-left: 3px solid #ff2a6d !important;
       background: linear-gradient(90deg, rgba(255, 42, 109, 0.12) 0%, transparent 100%) !important;
@@ -1272,24 +1484,26 @@
     }
 
     /* Active / Selected Chat Session: Single Illuminated Cyan Data Cartridge (NO nested boxes!) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ):is(.selected, [aria-selected="true"], [aria-current="page"], [activated], .mat-mdc-list-item-activated),
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      mat-list-item,
+      gem-nav-list-item
+    ):is(.selected, [aria-selected="true"], [aria-current="page"], [activated], .mat-mdc-list-item-activated, [class*="active"]),
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ) :is(a, button):is(.selected, [aria-selected="true"], [aria-current="page"], [activated]) {
+      mat-list-item,
+      gem-nav-list-item
+    ) :is(a, button, [role="button"], .item-container):is(.selected, [aria-selected="true"], [aria-current="page"], [activated], [class*="active"]) {
       background: linear-gradient(90deg, rgba(0, 240, 255, 0.16) 0%, rgba(0, 240, 255, 0.03) 100%) !important;
       border: none !important;
       border-left: 3.5px solid #00f0ff !important;
@@ -1306,24 +1520,26 @@
       0%, 100% { box-shadow: 0 0 8px rgba(0, 240, 255, 0.2); }
       50% { box-shadow: 0 0 16px rgba(0, 240, 255, 0.42); }
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ):is(.selected, [aria-selected="true"], [aria-current="page"], [activated], .mat-mdc-list-item-activated) :is(span, p, div, [class*="title"], [class*="text"]),
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+      mat-list-item,
+      gem-nav-list-item
+    ):is(.selected, [aria-selected="true"], [aria-current="page"], [activated], .mat-mdc-list-item-activated, [class*="active"]) :is(span, p, div, [class*="title"], [class*="text"], .title-text),
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="conversation-item"],
       [class*="history-item"],
       [class*="chat-item"],
       [class*="recent-item"],
       [class*="notebook-item"],
       [role="listitem"],
-      mat-list-item
-    ) :is(a, button):is(.selected, [aria-selected="true"], [aria-current="page"], [activated]) :is(span, p, div, [class*="title"], [class*="text"]) {
+      mat-list-item,
+      gem-nav-list-item
+    ) :is(a, button, [role="button"], .item-container):is(.selected, [aria-selected="true"], [aria-current="page"], [activated], [class*="active"]) :is(span, p, div, [class*="title"], [class*="text"], .title-text) {
       color: #00f0ff !important;
       font-weight: bold !important;
       text-shadow: 0 0 6px rgba(0, 240, 255, 0.6) !important;
@@ -1334,7 +1550,7 @@
     }
 
     /* History Item Context Menu Buttons (More options "...", pin, delete) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="more-menu"],
       [class*="actions-trigger"],
       [class*="action-button"],
@@ -1347,23 +1563,23 @@
       opacity: 0.8 !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="more-menu"],
       [class*="actions-trigger"],
       [class*="action-button"],
       button[aria-label*="More" i]
-    ) :is(mat-icon, svg) {
+    ) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) :is(
       [class*="more-menu"],
       [class*="actions-trigger"],
       [class*="action-button"],
       button[aria-label*="More" i]
-    ):hover :is(mat-icon, svg) {
+    ):hover :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
@@ -1371,12 +1587,14 @@
     }
 
     /* Bottom User Deck / Operator Profile Module (Clean, ZERO Concentric Ovals/Circles!) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(
       [class*="user-profile"],
       [class*="footer"],
       [class*="bottom-section"],
       [class*="user-info"],
-      [data-test-id*="user"]
+      [data-test-id*="user"],
+      sidenav-mavatar-footer,
+      .sidenav-mavatar-footer
     ) {
       border: none !important;
       border-top: 1.5px solid rgba(0, 240, 255, 0.35) !important;
@@ -1387,12 +1605,14 @@
       box-shadow: 0 -4px 14px rgba(0, 240, 255, 0.1) !important;
     }
     /* Strictly strip borders and background from all intermediate wrappers in the footer */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(
       [class*="user-profile"],
       [class*="footer"],
       [class*="bottom-section"],
       [class*="user-info"],
-      [data-test-id*="user"]
+      [data-test-id*="user"],
+      sidenav-mavatar-footer,
+      .sidenav-mavatar-footer
     ) :is(div, span, button, a) {
       border: none !important;
       outline: none !important;
@@ -1401,20 +1621,20 @@
     }
 
     /* Operator Avatar HUD Ring: ONLY on the actual image */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(img, [class*="avatar-img"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(img, [class*="avatar-img"], bard-mavatar, [class*="mavatar"]) {
       border: 1.5px solid #00f0ff !important;
       border-radius: 50% !important;
       box-shadow: 0 0 8px #00f0ff !important;
       transition: transform 0.2s ease, box-shadow 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is(img, [class*="avatar-img"]):hover {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(img, [class*="avatar-img"], bard-mavatar, [class*="mavatar"]):hover {
       box-shadow: 0 0 14px #ff2a6d !important;
       border-color: #ff2a6d !important;
       transform: scale(1.08) !important;
     }
 
     /* Operator Name ("Rohan Kosur") */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([class*="user-name"], [class*="display-name"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is([class*="user-name"], [class*="display-name"], [class*="account-name"]) {
       font-family: 'Share Tech Mono', monospace !important;
       color: #ffffff !important;
       font-weight: bold !important;
@@ -1423,7 +1643,7 @@
     }
 
     /* Operator Plan Badge ("Pro") */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([class*="plan-name"], [class*="subscription-tier"], [class*="tier"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is([class*="plan-name"], [class*="subscription-tier"], [class*="tier"]) {
       font-family: 'Share Tech Mono', monospace !important;
       color: #ffe600 !important;
       font-size: 11px !important;
@@ -1435,19 +1655,19 @@
     }
 
     /* Settings Gear Button (ZERO Outer Circles!) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="Settings" i], [class*="settings"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is([aria-label*="Settings" i], [class*="settings"]) {
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
       background: transparent !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="Settings" i], [class*="settings"]) :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is([aria-label*="Settings" i], [class*="settings"]) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.7)) !important;
       transition: transform 0.3s ease, color 0.2s ease !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) :is([aria-label*="Settings" i], [class*="settings"]):hover :is(mat-icon, svg) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is([aria-label*="Settings" i], [class*="settings"]):hover :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.9)) !important;
@@ -1455,13 +1675,13 @@
     }
 
     /* Response Actions (Thumbs, Copy, Share, Edit) */
-    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]) :is(mat-icon, svg) {
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]) :is(mat-icon, svg, gem-icon) {
       color: #00f0ff !important;
       fill: #00f0ff !important;
       filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.5)) !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):hover :is(mat-icon, svg) {
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):hover :is(mat-icon, svg, gem-icon) {
       color: #ff2a6d !important;
       fill: #ff2a6d !important;
       filter: drop-shadow(0 0 8px rgba(255, 42, 109, 0.8)) !important;
@@ -1469,7 +1689,7 @@
     html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):active {
       transform: scale(0.9) !important;
     }
-    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):active :is(mat-icon, svg) {
+    html.apex-war-enabled :is([class*="response-container"], .model-response, [class*="actions-container"]) :is(button, [role="button"]):active :is(mat-icon, svg, gem-icon) {
       transform: scale(0.9) !important;
       filter: drop-shadow(0 0 10px #ff2a6d) !important;
     }
@@ -1488,19 +1708,19 @@
     }
 
     /* Sidebar-specific Ultra-Thin Cyberdeck Scrollbar */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) ::-webkit-scrollbar {
       width: 4px !important;
       height: 4px !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar-track {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) ::-webkit-scrollbar-track {
       background: transparent !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar-thumb {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) ::-webkit-scrollbar-thumb {
       background: rgba(0, 240, 255, 0.35) !important;
       border-radius: 2px !important;
       box-shadow: 0 0 4px rgba(0, 240, 255, 0.5) !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, .navigation-drawer, nav) ::-webkit-scrollbar-thumb:hover {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav) ::-webkit-scrollbar-thumb:hover {
       background: #ff2a6d !important;
       box-shadow: 0 0 8px #ff2a6d !important;
     }
@@ -1696,7 +1916,7 @@
     </div>
     <div id="apex-hud-panel" class="${settings.hudOpen ? '' : 'hidden'}">
       <div class="apex-panel-header">
-        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.3.2</span>
+        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.4.0</span>
         <button class="apex-panel-close" id="apex-hud-close" title="Minimize Console">✕</button>
       </div>
       <div class="apex-hp-section">
@@ -1897,7 +2117,7 @@
     getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '20.3.2', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.4.0', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
@@ -1906,7 +2126,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v20.3.2 FINISHED PRODUCT ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.4.0 ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
@@ -4417,6 +4637,8 @@
     // Smooth HUD updates every ~8 frames
     hudTick++;
     if (hudTick % 8 === 0 && hudRoot) {
+      if (!canvas.isConnected && document.body) document.body.prepend(canvas);
+      if (!hudRoot.isConnected && document.body) document.body.appendChild(hudRoot);
       const fps = Math.round(1000 / Math.max(1, frameEMA));
       const pillFps = hudRoot.querySelector('#apex-pill-fps');
       if (pillFps) pillFps.textContent = `${fps} FPS`;
