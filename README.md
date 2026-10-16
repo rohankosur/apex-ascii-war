@@ -1,6 +1,6 @@
-# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.4.0
+# ⚡ Gemini — Apex ASCII War // Cyberdeck v20.4.1
 
-[![Version](https://img.shields.io/badge/version-20.4.0-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
+[![Version](https://img.shields.io/badge/version-20.4.1-00f0ff.svg?style=flat-square)](https://github.com/rohankosur/apex-ascii-war)
 [![License: MIT](https://img.shields.io/badge/license-MIT-ff2a6d.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Gemini-ffe600.svg?style=flat-square)](https://gemini.google.com/)
 [![Audio](https://img.shields.io/badge/audio-8--Bit%20Web%20Audio%20Synth-39ff14.svg?style=flat-square)](#-8-bit-web-audio-synthesizer)
@@ -10,15 +10,19 @@
 
 ---
 
-## 🎮 Highlights & New in v20.4.0 (Gemini 2026 Redesign Update)
+## 🎮 Highlights & New in v20.4.1 (Critical Fixes & Polish)
 
-- **🌌 Google Gemini 2026 Neural Expressive & GDS Redesign Compatibility**:
-  - **Full Support for `<input-area-v2>`**: Fully styled Gemini's new prompt chassis with translucent cyberdeck dark glass (`rgba(5, 9, 20, 0.62)`), crisp 1.5px cyan laser borders, and neon send buttons.
-  - **Eradication of Ambient Glow Smudges & Neural Expressive Blurs**: Google introduced `.lm-glow`, `.blur-bg`, `<chat-loading-animation>`, and `.nl-canvas` (`.nl-blob`, `.gradient-strip` with 146px blur). All ambient glow smudges have been eradicated (`display: none !important`), restoring deep pitch-black transparency so the ASCII war battlefield and neon arcade sun remain 100% visible and razor-sharp.
-  - **Luminous Symbols Font Protection**: Added shielding for Google's new `@font-face` `'Luminous Symbols'` (`.lumi-symbols`, `<gem-icon>`). Ligatures like `plus`, `mic`, `send`, `side_nav`, and `image_create` now render with crisp vector graphics instead of broken text ligatures.
-  - **Modern Model Switcher & Tools Drawer**: Styled `<gem-menu>`, `<gem-menu-item>`, `<new-model-picker-glow>`, `<toolbox-drawer>`, and `<mat-card class="card-container">` with cyberdeck glass and neon cyan/magenta styling.
-  - **Next-Gen Sidebar Chassis**: Seamlessly compatible with `<side-navigation-v2>`, `<side-navigation-content>`, `<gem-nav-list-item>`, and `<sidenav-mavatar-footer>`.
-  - **Self-Healing DOM Engine**: Added auto-reattachment checks in the animation loop to ensure the battle canvas and HUD console never detach during Angular route changes or chat resets.
+- **🛡️ Trusted Types Enforcement Compatibility (`TrustedHTML`)**:
+  - Google Gemini recently enforced CSP `TrustedHTML` assignment, throwing a fatal TypeError on raw `innerHTML` writes that previously halted script execution before the canvas and HUD could mount.
+  - Implemented `toTrustedHTML(...)` via `window.trustedTypes.createPolicy('apexWarPolicy', ...)` with resilient DOMParser fallbacks, ensuring the ASCII war simulation and Cyberdeck HUD always launch reliably.
+- **⭕ Eradicated Giant Cyan Oval Over Sidebar**:
+  - Eliminated the overbroad `[class*="mavatar"]` selector that accidentally matched `<side-navigation-content class="... sidenav-mavatar-migration-enabled ...">`, which had turned the entire upper sidebar container into a giant 50% border-radius oval. Confined avatar HUD borders strictly to individual avatar images (`img.user-icon`).
+- **✨ Sidebar Font Clarity & Text-Clip Clean-Up**:
+  - Fixed an overbroad `[class*="title"]` selector that had applied `-webkit-background-clip: text` to all sidebar list items (`.title-text`), eliminating font blurriness and rectangular drop-shadow clipping. Sidebar titles now render crisp, high-contrast monospace cyan-white text.
+- **⚡ Prompt Chassis & Focus Ring Refinement**:
+  - Switched prompt chassis `:focus-within` from harsh hot magenta to an electric cyan glow (`#00f0ff`), honoring user aesthetic preference.
+  - Eradicated rogue pseudo-element borders (`.mat-focus-indicator::before`) that previously caused an empty capsule pill outline to appear under `Flash v`.
+  - Borderless close-sidebar toggle button: Stripped accidental cyan header button boxes from `.close-sidenav-button`.
 
 ---
 
@@ -112,8 +116,8 @@ The sound engine is synthesized in real time using the native browser `AudioCont
 ### One-Click Install (Tampermonkey / Violentmonkey)
 1. Install [Tampermonkey](https://www.tampermonkey.net/) in Chrome, Brave, or Edge.
 2. Click this direct raw link:  
-   👉 **[Install apex-ascii-war.user.js (v20.4.0)](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js)**
-3. Tampermonkey will prompt you to install/update to **v20.4.0**. Click **Install** (or **Update**).
+   👉 **[Install apex-ascii-war.user.js (v20.4.1)](https://raw.githubusercontent.com/rohankosur/apex-ascii-war/main/apex-ascii-war.user.js)**
+3. Tampermonkey will prompt you to install/update to **v20.4.1**. Click **Install** (or **Update**).
 4. Navigate to [`https://gemini.google.com/`](https://gemini.google.com/) and refresh the page!
 
 ---

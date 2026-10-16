@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Gemini — Apex ASCII War (80s Cyberdeck Arcade & Citadel Warfare)
 // @namespace    neon.ascii.war
-// @version      20.4.0
+// @version      20.4.1
 // @description  The Finished Product: Tri-Sphere Tactical ASCII Battle Simulator with 80s Synthwave Bloom, Interactive Cyberdeck HUD Console, Pure Web Audio 8-Bit Synthesizer, Persistent Scoreboard, and Clean Monospace UI for Google Gemini (Full Gemini 2026 Neural Expressive & GDS Support).
 // @author       rohankosur
 // @license      MIT
@@ -528,25 +528,42 @@
       transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
     }
 
-    /* Focus State: Hot Magenta */
+    /* Focus State: Electric Cyan Glow (Clean & Subtle, NO harsh red boxes) */
     html.apex-war-enabled div.input-box:focus-within,
     html.apex-war-enabled input-area-v2:focus-within,
     html.apex-war-enabled :is(.input-area-container, chat-window-input) > div:first-child:focus-within {
-      border-color: #ff2a6d !important;
-      box-shadow: 0 0 22px rgba(255, 42, 109, 0.6), inset 0 0 14px rgba(255, 42, 109, 0.12) !important;
+      border-color: #00f0ff !important;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.65), inset 0 0 12px rgba(0, 240, 255, 0.12) !important;
     }
 
     /* All inner containers and buttons inside the input box: NO borders, NO rogue boxes! */
     html.apex-war-enabled :is(div.input-box, input-area-v2) :is(
       div, span, section, p, form, fieldset, rich-textarea, .text-input-field,
       .input-area-fieldset, .simplified-input-area, .leading-actions-wrapper, .trailing-actions-wrapper,
-      button, [role="button"], simplified-input-menu, new-model-picker-glow
+      button, [role="button"], simplified-input-menu, new-model-picker-glow,
+      .model-picker-container, bard-mode-switcher, .pill-ui-logo-container, .input-area-switch,
+      .mat-focus-indicator, .mdc-button__ripple, .mat-mdc-button-persistent-ripple
     ) {
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
       background: transparent !important;
       background-color: transparent !important;
+    }
+
+    /* Strip all pseudo-element borders & focus rings inside the input chassis */
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is(
+      .mat-focus-indicator, .mdc-button__ripple, .mat-mdc-button-persistent-ripple,
+      .input-area-switch, bard-mode-switcher, new-model-picker-glow
+    )::before,
+    html.apex-war-enabled :is(div.input-box, input-area-v2) :is(
+      .mat-focus-indicator, .mdc-button__ripple, .mat-mdc-button-persistent-ripple,
+      .input-area-switch, bard-mode-switcher, new-model-picker-glow
+    )::after {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      display: none !important;
     }
 
     /* Clean model picker glow halo/ring removal (keep content visible) */
@@ -680,24 +697,25 @@
     }
 
     /* Top Header & Business / App Links */
-    html.apex-war-enabled :is(header, [class*="header"], nav[aria-label*="banner" i]) :is(a, button) {
+    /* Top Header & Business / App Links (Top-Right only, NEVER inside sidebars) */
+    html.apex-war-enabled :is(header, [class*="header"]:not([class*="sidenav"])):not(side-navigation-v2 *):not(bard-sidenav *):not(side-navigation-content *) :is(a, button) {
       font-family: 'Share Tech Mono', monospace !important;
       color: #00f0ff !important;
       font-size: 13px !important;
       transition: all 0.2s ease !important;
     }
-    html.apex-war-enabled :is(header, [class*="header"]) a:hover {
+    html.apex-war-enabled :is(header, [class*="header"]:not([class*="sidenav"])):not(side-navigation-v2 *):not(bard-sidenav *):not(side-navigation-content *) a:hover {
       color: #ff2a6d !important;
       text-shadow: 0 0 8px rgba(255, 42, 109, 0.7) !important;
     }
-    html.apex-war-enabled :is(header, [class*="header"]) button:has(span, a) {
+    html.apex-war-enabled :is(header, [class*="header"]:not([class*="sidenav"])):not(side-navigation-v2 *):not(bard-sidenav *):not(side-navigation-content *) button:has(span, a) {
       background: transparent !important;
       border: 1px solid #00f0ff !important;
       border-radius: 4px !important;
       color: #00f0ff !important;
       box-shadow: 0 0 8px rgba(0, 240, 255, 0.3) !important;
     }
-    html.apex-war-enabled :is(header, [class*="header"]) button:has(span, a):hover {
+    html.apex-war-enabled :is(header, [class*="header"]:not([class*="sidenav"])):not(side-navigation-v2 *):not(bard-sidenav *):not(side-navigation-content *) button:has(span, a):hover {
       border-color: #ff2a6d !important;
       color: #ff2a6d !important;
       box-shadow: 0 0 12px rgba(255, 42, 109, 0.5) !important;
@@ -1152,8 +1170,10 @@
       background-color: transparent !important;
     }
 
-    /* Top Header & Gemini Title (Clean, NO outer box) */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is([class*="title"], [class*="logo-text"], .gemini-logo, [aria-label*="Gemini"]) {
+    /* Top Header & Gemini Title (Clean, NO outer box, ONLY Gemini Brand Title) */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
+      .gemini-sidenav-text, .gemini-logo, [class*="logo-text"], [class*="header-title"]
+    ):not(.title-text):not(gem-nav-list-item *):not([class*="item"] *) {
       background: linear-gradient(135deg, #00f0ff 0%, #ff2a6d 100%) !important;
       -webkit-background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
@@ -1162,15 +1182,28 @@
       border: none !important;
       outline: none !important;
       box-shadow: none !important;
-      filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)) !important;
+      filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.45)) !important;
     }
 
-    /* Enforce Share Tech Mono across sidebar text and labels (Bright cyan-white font) */
+    /* Enforce Share Tech Mono across sidebar text and labels (High-contrast cyan-white font, ZERO text-clip blur) */
     html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, header) :is(
-      [class*="title"], [class*="logo"], [class*="text"], [class*="label"], .title-text, .gds-body-s, .label-and-badge, span, a, button, p
-    ):not(:is(mat-icon, [class*="mat-icon"], .google-symbols, .lumi-symbols, [class*="lumi-symbols"], [fonticon], [data-mat-icon-type], i, svg, svg *)) {
+      .title-text, [class*="text"], [class*="label"], .gds-body-s, .label-and-badge, span, a, button, p
+    ):not(:is(mat-icon, [class*="mat-icon"], .google-symbols, .lumi-symbols, [class*="lumi-symbols"], [fonticon], [data-mat-icon-type], i, svg, svg *, gem-icon, gem-icon *, .gemini-sidenav-text)) {
       font-family: 'Share Tech Mono', monospace !important;
       color: #cbe9ff !important;
+      -webkit-background-clip: border-box !important;
+      -webkit-text-fill-color: initial !important;
+      filter: none !important;
+    }
+
+    /* Top Sidebar Header Row & Close Sidebar Button: borderless & transparent */
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content) :is(
+      .sidenav-header-buttons, .close-sidenav-button, .side-nav-sparkle-button, gem-icon-button, button[aria-label*="sidebar" i]
+    ) {
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
     }
 
     /* Header Hamburger Menu Button */
@@ -1621,13 +1654,22 @@
     }
 
     /* Operator Avatar HUD Ring: ONLY on the actual image */
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(img, [class*="avatar-img"], bard-mavatar, [class*="mavatar"]) {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(
+      img.user-icon, img[class*="avatar"], [class*="avatar-img"], bard-mavatar img, .mavatar-image, user-profile-picture img
+    ) {
+      width: 32px !important;
+      height: 32px !important;
+      max-width: 36px !important;
+      max-height: 36px !important;
       border: 1.5px solid #00f0ff !important;
       border-radius: 50% !important;
       box-shadow: 0 0 8px #00f0ff !important;
       transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      display: inline-block !important;
     }
-    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(img, [class*="avatar-img"], bard-mavatar, [class*="mavatar"]):hover {
+    html.apex-war-enabled :is(side-navigation-drawer, bard-sidenav, side-navigation-v2, side-navigation-content, .navigation-drawer, nav, sidenav-mavatar-footer) :is(
+      img.user-icon, img[class*="avatar"], [class*="avatar-img"], bard-mavatar img, .mavatar-image, user-profile-picture img
+    ):hover {
       box-shadow: 0 0 14px #ff2a6d !important;
       border-color: #ff2a6d !important;
       transform: scale(1.08) !important;
@@ -1904,11 +1946,31 @@
   if (settings.scanlines) document.documentElement.classList.add('scanlines-enabled');
   document.body.prepend(canvas);
 
+  // TrustedHTML Safe Policy Wrapper (Prevents TypeError on TrustedTypes-enforced domains like Gemini)
+  let apexTrustedPolicy = null;
+  function toTrustedHTML(htmlStr) {
+    if (typeof window !== 'undefined' && window.trustedTypes && window.trustedTypes.createPolicy) {
+      if (!apexTrustedPolicy) {
+        try {
+          apexTrustedPolicy = window.trustedTypes.createPolicy('apexWarPolicy', {
+            createHTML: s => s
+          });
+        } catch (e) {
+          apexTrustedPolicy = window.trustedTypes.defaultPolicy || { createHTML: s => s };
+        }
+      }
+      try {
+        return apexTrustedPolicy.createHTML(htmlStr);
+      } catch (e) {}
+    }
+    return htmlStr;
+  }
+
   // Mount Cyberdeck Retro HUD Widget
   const hudRoot = document.createElement('div');
   hudRoot.id = 'apex-cyberdeck-root';
   if (!settings.hudVisible) hudRoot.style.display = 'none';
-  hudRoot.innerHTML = `
+  const hudHTML = `
     <div id="apex-hud-pill" title="Toggle Cyberdeck Console (Alt+Shift+H)">
       <span class="pulse-dot"></span>
       <span style="font-weight:bold;color:#00f0ff;">⚡ CYBERDECK</span>
@@ -1916,7 +1978,7 @@
     </div>
     <div id="apex-hud-panel" class="${settings.hudOpen ? '' : 'hidden'}">
       <div class="apex-panel-header">
-        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.4.0</span>
+        <span class="apex-panel-title">⚡ CYBERDECK CONSOLE // v20.4.1</span>
         <button class="apex-panel-close" id="apex-hud-close" title="Minimize Console">✕</button>
       </div>
       <div class="apex-hp-section">
@@ -1959,6 +2021,17 @@
       </div>
     </div>
   `;
+  try {
+    hudRoot.innerHTML = toTrustedHTML(hudHTML);
+  } catch (e) {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(toTrustedHTML(hudHTML), 'text/html');
+      while (doc.body.firstChild) hudRoot.appendChild(doc.body.firstChild);
+    } catch (e2) {
+      console.warn('[Apex ASCII War] HUD HTML assignment fallback:', e2);
+    }
+  }
   document.body.appendChild(hudRoot);
 
   // Wire HUD Console Event Listeners
@@ -2117,7 +2190,7 @@
     getSettings() { return { ...settings }; },
     stats() {
       return {
-        version: '20.4.0', biome, paused, quality, autoQuality, units: units.length,
+        version: '20.4.1', biome, paused, quality, autoQuality, units: units.length,
         doctrines, teams: [0, 1].map(t => units.filter(u => u.team === t).length),
         projectiles: shots.length, debris: particles.length, effects: effects.length,
         frameMs: +frameEMA.toFixed(2), roundSeconds: +roundTime.toFixed(1),
@@ -2126,7 +2199,7 @@
     }
   };
   window[KEY] = api;
-  console.log('%c[Apex ASCII War] v20.4.0 ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
+  console.log('%c[Apex ASCII War] v20.4.1 ACTIVE - Cyberdeck Console, 8-Bit Web Audio & Full Arcade Simulator Loaded', 'color: #00f0ff; font-weight: bold;');
 
   function groundAt(x) {
     if (biome === 'naval') {
